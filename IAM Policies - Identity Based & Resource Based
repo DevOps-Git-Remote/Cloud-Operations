@@ -1,0 +1,146 @@
+## **📌 Identity-based Policies vs. Resource-based Policies in AWS IAM**  
+
+AWS IAM supports two main types of policies:  
+1️⃣ **Identity-based policies** – Attached to IAM users, groups, or roles.  
+2️⃣ **Resource-based policies** – Attached directly to AWS resources.  
+
+---
+
+## **🔹 Identity-Based Policies**  
+
+📌 **What are Identity-Based Policies?**  
+Identity-based policies define **what actions an IAM user, group, or role can perform on AWS resources**.  
+- These are attached to **IAM users, groups, or roles**.  
+- They specify **which actions are allowed or denied**.  
+- They apply across multiple resources.  
+
+✅ **Examples of Identity-Based Policies:**  
+✔ Allow a user to create an S3 bucket.  
+✔ Restrict an IAM role to only access EC2 instances in a specific region.  
+
+### **📝 Example: Identity-Based Policy (Allow S3 Read Access)**
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::example-bucket/*"
+    }
+  ]
+}
+```
+📌 **Explanation:**  
+- This policy is attached to an **IAM user, group, or role**.  
+- It **allows reading objects** from the `example-bucket`.  
+
+### **🔹 Types of Identity-Based Policies**
+| **Type** | **Description** | **Example** |
+|-------------|-----------------|-----------|
+| **AWS Managed Policies** | Predefined policies by AWS | `AdministratorAccess`, `ReadOnlyAccess` |
+| **Customer Managed Policies** | Custom policies created by users | A custom S3 full-access policy |
+| **Inline Policies** | Embedded directly into a user, group, or role | One-off permissions for a specific IAM role |
+
+---
+
+## **🔹 Resource-Based Policies**  
+
+📌 **What are Resource-Based Policies?**  
+Resource-based policies **define which principals (users, roles, accounts) can access a specific AWS resource**.  
+- Attached **directly to the resource**, not to an IAM entity.  
+- Allows **cross-account access** to resources.  
+- Supports both **Allow and Deny rules**.  
+
+✅ **Examples of Resource-Based Policies:**  
+✔ Allow an IAM user from **another AWS account** to access an S3 bucket.  
+✔ Grant an AWS Lambda function **permission to read from an S3 bucket**.  
+
+### **📝 Example: Resource-Based Policy (Allow Cross-Account S3 Access)**
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::123456789012:root" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::example-bucket/*"
+    }
+  ]
+}
+```
+📌 **Explanation:**  
+- This policy is **attached directly to the S3 bucket**.  
+- Allows **IAM users from AWS Account `123456789012`** to read objects.  
+
+### **🔹 AWS Services that Support Resource-Based Policies**
+| **Service** | **Resource** |
+|------------|------------|
+| **Amazon S3** | Buckets and objects |
+| **AWS Lambda** | Function permissions |
+| **Amazon SNS & SQS** | Topics & queues |
+| **AWS KMS** | Key policies |
+| **AWS Secrets Manager** | Secret access |
+
+---
+
+## **🔹 Key Differences: Identity-Based vs. Resource-Based Policies**
+| **Feature** | **Identity-Based Policies** | **Resource-Based Policies** |
+|------------|-------------------|--------------------|
+| **Attached To** | IAM users, groups, roles | AWS resources (S3, Lambda, SNS, SQS, etc.) |
+| **Scope** | Permissions for multiple resources | Controls access to a specific resource |
+| **Cross-Account Access** | Requires IAM roles and trust policies | Can grant access to other AWS accounts |
+| **Use Case** | Define what an IAM user, group, or role can do | Define who can access a resource |
+
+---
+
+## **📌 IAM Policy Evaluation Order**
+When a request is made to access an AWS resource, AWS evaluates policies in the following order:  
+1️⃣ **Explicit Deny** – If any policy explicitly denies access, the request is denied.  
+2️⃣ **Explicit Allow** – If there's an explicit allow and no deny, the request is allowed.  
+3️⃣ **Implicit Deny** – If no policy explicitly allows the request, it is denied by default.  
+
+---
+
+## **🚀 Best Practices for IAM Policies**
+✔ **Follow the Least Privilege Principle** – Grant only the necessary permissions.  
+✔ **Use Identity-Based Policies for Internal Users & Services** – Manage permissions at the IAM level.  
+✔ **Use Resource-Based Policies for Cross-Account Access** – When sharing AWS resources across accounts.  
+✔ **Combine Both** – For **fine-grained access control**.  
+
+---
+
+## **📌 Hands-On: Configuring IAM Policies**
+### **1️⃣ Creating an Identity-Based Policy (AWS CLI)**
+```sh
+aws iam create-policy --policy-name S3ReadAccess --policy-document file://policy.json
+```
+
+### **2️⃣ Attaching the Policy to a User**
+```sh
+aws iam attach-user-policy --user-name DevUser --policy-arn arn:aws:iam::aws:policy/S3ReadAccess
+```
+
+### **3️⃣ Adding a Resource-Based Policy to an S3 Bucket**
+```sh
+aws s3api put-bucket-policy --bucket example-bucket --policy file://s3-policy.json
+```
+
+---
+
+## **📌 Summary**
+✔ **Identity-Based Policies** – Define what an IAM entity (user, group, role) can do.  
+✔ **Resource-Based Policies** – Define who can access a specific AWS resource.  
+✔ **Cross-Account Access** – Use **resource-based policies** for sharing AWS resources securely.  
+✔ **Best Practice** – **Combine both types** for enhanced security.  
+
+---
+
+## **🎯 What’s Next?**
+Would you like:  
+✅ **Practice Questions for IAM policies?**  
+✅ **More Hands-on Labs?**  
+✅ **Real-World Scenarios & Use Cases?**  
+
+🚀 Let me know what you’d like to focus on next! 😊
