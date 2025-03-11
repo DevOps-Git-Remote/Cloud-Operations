@@ -1,0 +1,209 @@
+# **📌 Service Control Policies (SCPs) in AWS Organizations - A Detailed Guide**  
+
+## **🔹 What is a Service Control Policy (SCP)?**
+A **Service Control Policy (SCP)** is an AWS Organizations feature that allows administrators to **define permission boundaries** for AWS accounts within an organization. SCPs **do not grant permissions**; instead, they **restrict permissions** at the organizational level.  
+
+---
+
+## **🔹 Key Characteristics of SCPs**
+✔ **Applied to AWS Accounts, OUs, and the Root Organization**  
+✔ **Control Access Across Multiple Accounts**  
+✔ **Restrict Access but Do Not Grant Permissions**  
+✔ **Work Alongside IAM Policies**  
+✔ **Do Not Affect the Management Account**  
+
+---
+
+## **🔹 SCP vs. IAM Policies**
+| **Feature** | **SCP** | **IAM Policy** |
+|------------|--------|--------------|
+| **Scope** | Applies to all IAM users, roles, and root users within an AWS account. | Applies to specific users, roles, or groups. |
+| **Grants Permissions?** | ❌ No, only restricts. | ✅ Yes, grants and restricts permissions. |
+| **Use Case** | Used for organization-wide restrictions (e.g., block certain services). | Used to define user-specific access (e.g., allow access to S3). |
+| **Who It Affects** | Everyone in the AWS account (except the management account). | Only the assigned IAM user, group, or role. |
+
+📌 **Important:** If an IAM policy allows an action but an SCP denies it, **the action will be denied**.  
+
+---
+
+## **🔹 How SCPs Work**
+1️⃣ **Define an SCP in AWS Organizations.**  
+2️⃣ **Attach the SCP to an Organizational Unit (OU), AWS account, or root organization.**  
+3️⃣ **SCP applies restrictions to all IAM users and roles in the attached accounts.**  
+
+---
+
+## **🔹 SCP Policy Structure**
+SCPs use JSON format, similar to IAM policies.  
+
+### **📌 Basic SCP Structure**
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": "s3:DeleteBucket",
+      "Resource": "*"
+    }
+  ]
+}
+```
+📌 **Explanation:**  
+- This SCP **denies all AWS accounts in the organization from deleting S3 buckets**.  
+- Even if an IAM policy allows `s3:DeleteBucket`, this SCP will override it.  
+
+---
+
+## **🔹 Types of SCPs**
+| **Type** | **Description** | **Example** |
+|----------|----------------|-------------|
+| **Deny SCP** | Restricts specific AWS actions for all accounts. | Block deleting S3 buckets. |
+| **Allow SCP** (Less common) | Explicitly allows only specific AWS services. | Allow only EC2 and S3 services. |
+| **Guardrail SCP** | Enforces security best practices. | Require all accounts to use encrypted storage. |
+
+---
+
+## **🔹 Common SCP Examples**
+### **1️⃣ Deny Deleting S3 Buckets**
+Prevents users from **deleting S3 buckets** across the organization.
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": "s3:DeleteBucket",
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### **2️⃣ Deny Creating IAM Users and Roles**
+Prevents all users from **creating new IAM users and roles**.
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": [
+        "iam:CreateUser",
+        "iam:CreateRole"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### **3️⃣ Allow Only EC2 and S3 Services**
+Restricts users to **only use EC2 and S3**, denying access to all other AWS services.
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "NotAction": [
+        "ec2:*",
+        "s3:*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+📌 **Explanation:**  
+- `"NotAction"` denies **everything except EC2 and S3**.  
+- All other AWS services will be **blocked**.  
+
+### **4️⃣ Deny Actions Outside a Specific AWS Region**
+Prevents users from **launching EC2 instances outside `us-east-1`**.
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        }
+      }
+    }
+  ]
+}
+```
+📌 **Explanation:**  
+- Users **cannot** launch EC2 instances in any region **except `us-east-1`**.  
+
+### **5️⃣ Require All Resources to be Encrypted**
+Ensures that **all Amazon S3 buckets, EBS volumes, and RDS instances use encryption**.
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": [
+        "s3:PutObject",
+        "ec2:RunInstances",
+        "rds:CreateDBInstance"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    }
+  ]
+}
+```
+📌 **Explanation:**  
+- Prevents users from **storing unencrypted data** in S3, EC2, or RDS.  
+
+---
+
+## **🔹 Applying SCPs in AWS Organizations**
+### **📌 Steps to Apply an SCP**
+1️⃣ **Sign in to AWS Organizations** in the AWS Management Console.  
+2️⃣ Navigate to **Service Control Policies** under "Policies".  
+3️⃣ Click **Create Policy** and define the SCP in JSON format.  
+4️⃣ Attach the SCP to **Root, Organizational Units (OUs), or specific AWS Accounts**.  
+5️⃣ The SCP restrictions take effect immediately.  
+
+---
+
+## **🔹 SCP Best Practices**
+✔ **Attach SCPs to OUs, Not Individual Accounts** – Makes management easier.  
+✔ **Use SCPs for Guardrails, Not Permissions** – SCPs should **only restrict**, not grant access.  
+✔ **Test SCPs on a Small Set of Accounts** – Avoid accidental lockouts.  
+✔ **Combine SCPs with IAM Policies** – SCPs restrict access; IAM policies define access.  
+✔ **Enable AWS CloudTrail** – Monitor API activity and detect SCP violations.  
+
+---
+
+## **🔹 Summary**
+✔ **SCPs control what AWS accounts and users can do within an AWS Organization.**  
+✔ **They do not grant permissions but restrict actions** across accounts.  
+✔ **SCPs apply to all IAM users and roles in an account, including the root user.**  
+✔ **Common SCP use cases include**:  
+   - **Blocking S3 bucket deletion**  
+   - **Restricting regions for EC2 instances**  
+   - **Ensuring encryption for all AWS resources**  
+✔ **SCPs work alongside IAM policies** to enforce security and governance.  
+
+---
+
+## **🚀 What’s Next?**
+Would you like:  
+✅ **Hands-on SCP implementation guide?**  
+✅ **Step-by-step SCP testing and validation?**  
+✅ **Advanced SCP use cases for enterprises?**  
+
+Let me know! 😊
