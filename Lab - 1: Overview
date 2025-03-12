@@ -1,0 +1,122 @@
+## **Lab Overview and Task Breakdown**  
+
+This lab focuses on **AWS Systems Manager** and **AWS Config** to audit and manage AWS resources, particularly EC2 instances. 
+You will set up inventory tracking, log in to instances securely, audit compliance with AWS Config, and review collected metadata.  
+
+---
+
+### **Lab Objectives**  
+By the end of the lab, you should be able to:  
+✅ Set up **AWS Systems Manager Inventory** for an AWS infrastructure.  
+✅ Use **AWS Systems Manager** to securely log into Amazon EC2 instances.  
+✅ Configure **AWS Config** to audit AWS resources for compliance.  
+✅ Use **AWS Systems Manager Inventory** to view metadata on managed instances.  
+
+---
+
+## **Task Breakdown and Analysis**  
+
+### **Task 1: Set Up AWS Systems Manager Inventory**  
+✅ Purpose: To **track metadata** (OS version, installed apps, etc.) on EC2 instances.  
+
+**Steps:**  
+1. Open **AWS Systems Manager** → Navigate to **Inventory** → Click **Setup Inventory**.  
+2. Choose **Manually selecting instances** → Select **Web Server** and **App Server** instances.  
+3. Click **Setup Inventory**.  
+4. Expected Output: A **green success banner** confirming inventory setup.  
+
+**Key Insights:**  
+- SSM Agent **must be installed** on the instances (Amazon Linux 2 has it pre-installed).  
+- IAM permissions are required for both **the user** and **EC2 instances**.  
+
+---
+
+### **Task 2: Log into an Amazon EC2 Instance with AWS Systems Manager Session Manager**  
+✅ Purpose: To **securely access an EC2 instance** without SSH (no port 22 needed).  
+
+**Steps:**  
+1. Open **Systems Manager** → Navigate to **Fleet Manager**.  
+2. Click on the **Web Server instance ID**.  
+3. Select **Connect > Start terminal session**.  
+4. Run the following commands:  
+
+   ```sh
+   netstat -a | grep http  # List active HTTP connections
+   ```
+
+   ```sh
+   TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+   AZ=`curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/placement/availability-zone`
+   export AWS_DEFAULT_REGION=${AZ::-1}
+   aws ec2 describe-instances
+   ```
+
+5. **Terminate the session** → Close the browser tab.  
+
+**Key Insights:**  
+- **No need for SSH keys** → AWS Session Manager is **more secure**.  
+- **AWS CloudTrail** can log all session activity.  
+
+---
+
+### **Task 3: Enable AWS Config & Create a Compliance Rule**  
+✅ Purpose: To audit EC2 instances and check if they are **managed by AWS Systems Manager**.  
+
+**Steps:**  
+1. Open **AWS Config** → Click **Get Started**.  
+2. Choose:  
+   - **All resource types with customizable overrides**.  
+   - **Continuous recording**.  
+   - **Create AWS Config service-linked role** (or use an existing one).  
+3. Click **Next** → Search for rule **ec2-instance-managed-by-systems-manager**.  
+4. Select the rule → Click **Next** → **Confirm** setup.  
+5. AWS Config will scan EC2 instances and **evaluate compliance**.  
+
+**Key Insights:**  
+- **AWS Config continuously records changes** in resource configurations.  
+- EC2 instances should eventually show as **Compliant** (takes a few minutes).  
+
+---
+
+### **Task 4: Audit IAM User Permissions with AWS Config**  
+✅ Purpose: To check for **IAM users with inline policies** (not recommended for security).  
+
+**Steps:**  
+1. Go to **AWS Config** → Select **Rules** → Click **Add Rule**.  
+2. Search for **iam-user-no-policies-check**.  
+3. Select the rule → Click **Next** → Accept defaults → Click **Save**.  
+4. AWS Config scans IAM users and **flags inline policies**.  
+
+**Key Insights:**  
+- **Inline policies are risky** because they are user-specific (use managed policies instead).  
+- Compliance status will likely show **Non-Compliant**, but no remediation is required in this lab.  
+
+---
+
+### **Task 5: Explore Systems Manager Inventory Data**  
+✅ Purpose: To view metadata collected from EC2 instances.  
+
+**Steps:**  
+1. Open **AWS Systems Manager** → Go to **Inventory**.  
+2. Check the **Top 5 Applications** installed on managed EC2 instances.  
+3. Select an **instance ID** → View:  
+   - **General section**: IP address, SSH key, instance type.  
+   - **Tags section**: Associated tags.  
+   - **Inventory section**: Search for `bind-utils` package.  
+   - **Associations section**: Last SSM document executed.  
+   - **Patches section**: Installed patches.  
+
+**Key Insights:**  
+- Systems Manager **centralizes inventory data** for all managed instances.  
+- This is useful for **tracking installed software, patches, and security compliance**.  
+
+---
+
+## **Final Notes and Key Takeaways**  
+- **AWS Systems Manager** simplifies EC2 management by allowing **secure access, inventory tracking, and fleet management**.  
+- **AWS Config** continuously **monitors AWS resources** and ensures **compliance**.  
+- **Session Manager replaces SSH** for secure, auditable EC2 access.  
+- **IAM inline policies should be avoided**—use **managed policies** instead.  
+- **Data synchronization delays are expected** in AWS Config; refresh periodically.  
+
+Would you like **help with any specific part**, or need **detailed explanations on IAM roles, permissions, or configurations**? 🚀
