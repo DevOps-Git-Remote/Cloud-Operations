@@ -117,7 +117,8 @@ AWS RAM allows **resource sharing** across AWS accounts without duplicating IAM 
 ---
 # **🌟 Authentication Principles in AWS (Detailed Guide) 🌟**  
 
-**Authentication** is the process of verifying a user's identity before granting access to AWS services. It ensures that only authorized users and applications can access AWS resources securely.  
+**Authentication** is the process of verifying a user's identity before granting access to AWS services. 
+It ensures that only authorized users and applications can access AWS resources securely.  
 
 ---
 
