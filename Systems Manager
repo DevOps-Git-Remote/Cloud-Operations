@@ -1,0 +1,217 @@
+# **🔷 AWS Systems Manager (SSM) – A Complete Guide**  
+
+## **📌 What is AWS Systems Manager?**  
+AWS **Systems Manager (SSM)** is a **unified management service** that helps automate operational tasks, manage configurations, 
+and improve security across **EC2 instances, on-premises servers, and hybrid environments**.  
+
+✅ **Automates Patching & Configuration Management**  
+✅ **Provides Secure Access via Session Manager (No SSH/RDP Needed)**  
+✅ **Monitors & Troubleshoots Instances with Run Command & State Manager**  
+✅ **Tracks Inventory & Compliance with AWS Config & Systems Manager Inventory**  
+✅ **Enables Secure Remote Access via AWS CloudShell & Session Manager**  
+
+---
+
+## **🔹 Core Features of AWS Systems Manager**
+| **Feature** | **Description** |
+|------------|---------------|
+| **Session Manager** | Securely access EC2 instances **without SSH or RDP**. |
+| **Run Command** | Execute remote commands **without logging into instances**. |
+| **Patch Manager** | Automate **OS & application patching**. |
+| **State Manager** | Automate **configuration enforcement**. |
+| **Inventory** | Collect & view **instance metadata** (software, OS, updates). |
+| **Automation** | Define **runbooks** to automate complex IT workflows. |
+| **Parameter Store** | Securely store **secrets, passwords, & configurations**. |
+| **Compliance & Security** | Monitor **security compliance & audit logs**. |
+
+---
+
+# **1️⃣ AWS SSM Agent – The Heart of Systems Manager**
+**SSM Agent** is a lightweight software **installed on EC2 instances, on-prem servers, and VMs** that allows AWS Systems Manager to manage them.
+
+### **🔹 How to Install & Start the SSM Agent**
+**For Amazon Linux & Ubuntu:**
+```bash
+sudo yum install -y amazon-ssm-agent
+sudo systemctl start amazon-ssm-agent
+sudo systemctl enable amazon-ssm-agent
+```
+
+**For Windows:**
+```powershell
+Start-Service AmazonSSMAgent
+Set-Service -Name AmazonSSMAgent -StartupType Automatic
+```
+
+### **🔹 How to Check SSM Agent Status**
+```bash
+sudo systemctl status amazon-ssm-agent
+```
+
+---
+
+# **2️⃣ Secure Remote Access with Session Manager**
+Session Manager provides **secure shell access** to EC2 instances **without SSH or RDP**.
+
+### **🔹 Benefits of Session Manager**
+✔️ **No Open Ports** – Eliminates security risks from SSH/RDP.  
+✔️ **IAM-Based Access** – No need for private keys or passwords.  
+✔️ **Audit Logging** – Logs all session activities to **AWS CloudTrail**.  
+✔️ **Supports Port Forwarding** – Enables secure tunneling for apps.  
+
+### **🔹 Start a Session Using AWS CLI**
+```bash
+aws ssm start-session --target i-0abcdef1234567890
+```
+
+### **🔹 Enable Port Forwarding (Example for Web App on Port 8080)**
+```bash
+aws ssm start-session --target i-0abcdef1234567890 --document-name AWS-StartPortForwardingSession --parameters portNumber=8080,localPortNumber=9090
+```
+
+---
+
+# **3️⃣ Automate Command Execution with Run Command**
+AWS **Run Command** allows you to execute scripts **on multiple instances** simultaneously **without logging in**.
+
+### **🔹 Use Cases**
+✔️ **Update Software & Patch Systems**  
+✔️ **Restart Services**  
+✔️ **Run Security Scans**  
+
+### **🔹 Example: Running a Shell Command on an EC2 Instance**
+```bash
+aws ssm send-command --document-name "AWS-RunShellScript" \
+    --targets "Key=instanceIds,Values=i-0abcdef1234567890" \
+    --parameters 'commands=["df -h"]'
+```
+
+### **🔹 Example: Running a PowerShell Command on a Windows Instance**
+```bash
+aws ssm send-command --document-name "AWS-RunPowerShellScript" \
+    --targets "Key=instanceIds,Values=i-0abcdef1234567890" \
+    --parameters 'commands=["Get-Service"]'
+```
+
+---
+
+# **4️⃣ Patch Manager – Automate Patch Management**
+AWS **Patch Manager** automates **patching** of EC2 instances **for security updates & compliance**.
+
+### **🔹 Steps to Configure Patch Manager**
+1️⃣ Define a **Patch Baseline** (Windows/Linux).  
+2️⃣ Assign an **IAM Role** to allow patching.  
+3️⃣ Schedule patching using **AWS Systems Manager Maintenance Window**.  
+
+### **🔹 Example: Apply Patches on EC2 Instances**
+```bash
+aws ssm create-association \
+    --name "AWS-RunPatchBaseline" \
+    --targets "Key=instanceIds,Values=i-0abcdef1234567890"
+```
+
+---
+
+# **5️⃣ State Manager – Maintain Configuration Compliance**
+AWS **State Manager** enforces **consistent system configurations** across instances.
+
+✔️ **Ensure correct settings (Firewall, SSH, Services, etc.)**  
+✔️ **Auto-remediate configuration drifts**  
+
+### **🔹 Example: Enforcing a Configuration on EC2**
+```bash
+aws ssm create-association \
+    --name "AWS-ApplyPatchBaseline" \
+    --targets "Key=instanceIds,Values=i-0abcdef1234567890"
+```
+
+---
+
+# **6️⃣ Collect & Analyze Inventory Data**
+AWS **SSM Inventory** collects **software, OS versions, and application details**.
+
+### **🔹 Enable Inventory on EC2**
+```bash
+aws ssm create-association --name "AWS-GatherSoftwareInventory" \
+    --targets "Key=instanceIds,Values=i-0abcdef1234567890"
+```
+
+### **🔹 View Inventory Data**
+```bash
+aws ssm list-inventory-entries --instance-id i-0abcdef1234567890
+```
+
+---
+
+# **7️⃣ Automate Repetitive Tasks with AWS Automation**
+AWS **Automation** lets you create **runbooks** to automate complex tasks.
+
+✔️ **Automate Backup Creation**  
+✔️ **Automate EC2 Instance Recovery**  
+✔️ **Automate Security Fixes**  
+
+### **🔹 Example: Restart an EC2 Instance**
+```bash
+aws ssm start-automation-execution --document-name "AWS-RestartEC2Instance" \
+    --parameters "InstanceId=i-0abcdef1234567890"
+```
+
+---
+
+# **8️⃣ AWS Systems Manager Parameter Store**
+AWS **Parameter Store** securely **stores secrets, passwords, and configurations**.
+
+### **🔹 Create a Secure Parameter**
+```bash
+aws ssm put-parameter --name "DBPassword" --value "SecurePass123" --type "SecureString"
+```
+
+### **🔹 Retrieve a Secure Parameter**
+```bash
+aws ssm get-parameter --name "DBPassword" --with-decryption
+```
+
+---
+
+# **9️⃣ AWS Systems Manager Compliance & Security**
+AWS **Compliance** tracks whether EC2 instances meet security & patching policies.
+
+### **🔹 Check Compliance Status**
+```bash
+aws ssm list-compliance-summaries
+```
+
+✔️ **Identify non-compliant instances**  
+✔️ **Generate security reports**  
+
+---
+
+# **🔟 Logging & Monitoring with AWS Systems Manager**
+✔️ **Log all actions using AWS CloudTrail**  
+✔️ **Send logs to Amazon CloudWatch**  
+
+### **🔹 Enable Session Logging to CloudWatch**
+```bash
+aws ssm update-document \
+    --name "SSM-SessionManagerRunShell" \
+    --content '{"CloudWatchOutputConfig": {"CloudWatchLogGroupName": "SSM-Logs"}}'
+```
+
+---
+
+## **📌 Summary – Why Use AWS Systems Manager?**
+| **Feature** | **Benefit** |
+|------------|------------|
+| **Session Manager** | Secure, SSH-less access to EC2 |
+| **Run Command** | Execute commands remotely |
+| **Patch Manager** | Automate patching & updates |
+| **State Manager** | Enforce configuration policies |
+| **Inventory** | Track instance metadata |
+| **Automation** | Automate EC2 tasks |
+| **Parameter Store** | Securely store secrets & configurations |
+| **Logging & Compliance** | Ensure security & audit readiness |
+
+---
+
+## **🚀 Next Steps**
+Would you like a **step-by-step lab** to practice AWS Systems Manager features? 😊
