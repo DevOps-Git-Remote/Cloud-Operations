@@ -1,0 +1,123 @@
+# **🔹 AWS Command Line Interface (AWS CLI) - In Detail**  
+
+AWS CLI is a **powerful command-line tool** that lets you interact with AWS services via scripts and commands. 
+It helps in **automation, resource management, and troubleshooting** without needing to use the AWS Management Console.
+
+---
+
+# **1️⃣ AWS CLI Command Line Format**  
+Every AWS CLI command follows a **standard format**:
+
+```bash
+aws <service> <command> [options]
+```
+
+### **Breakdown of AWS CLI Command Structure**
+| **Component** | **Description** | **Example** |
+|--------------|----------------|-------------|
+| `aws` | Calls the AWS CLI | `aws` |
+| `<service>` | Specifies the AWS service | `s3`, `ec2`, `iam` |
+| `<command>` | Specifies the operation to perform | `ls`, `describe-instances`, `start-instances` |
+| `[options]` | Additional parameters (filters, outputs, etc.) | `--region us-east-1`, `--query`, `--output json` |
+
+---
+
+### **✅ Example AWS CLI Commands**
+1️⃣ **List all S3 buckets:**  
+```bash
+aws s3 ls
+```
+2️⃣ **Describe running EC2 instances:**  
+```bash
+aws ec2 describe-instances --filters "Name=instance-state-name,Values=running"
+```
+3️⃣ **Create an S3 bucket:**  
+```bash
+aws s3 mb s3://my-new-bucket
+```
+4️⃣ **Stop an EC2 instance:**  
+```bash
+aws ec2 stop-instances --instance-ids i-0abcdef1234567890
+```
+
+---
+
+# **2️⃣ AWS CLI Options**
+AWS CLI commands can have additional **options** that modify their behavior. Some of the most commonly used options include:
+
+| **Option** | **Description** | **Example** |
+|------------|----------------|-------------|
+| `--region` | Specifies the AWS region for the command | `--region us-east-1` |
+| `--profile` | Uses a specific AWS CLI profile | `--profile my-profile` |
+| `--query` | Filters the output using JMESPath syntax | `--query "Reservations[*].Instances[*].InstanceId"` |
+| `--output` | Changes the output format (`json`, `table`, `text`) | `--output json` |
+| `--dry-run` | Simulates a command without executing it | `--dry-run` |
+
+---
+
+# **3️⃣ AWS CLI `--dry-run` Option**
+### **📌 What is `--dry-run`?**
+- `--dry-run` is a **safe testing** option that allows you to **simulate** a command **without actually running it**.
+- It checks whether the action is **possible** and whether you have the **correct permissions**.
+- If successful, it **does not** make any real changes.
+
+### **✅ Example Usage of `--dry-run`**
+1️⃣ **Stopping an EC2 instance (Dry Run Test)**
+```bash
+aws ec2 stop-instances --instance-ids i-0abcdef1234567890 --dry-run
+```
+**Expected Output (if allowed):**  
+```json
+{
+    "Errors": [
+        {
+            "Code": "DryRunOperation",
+            "Message": "Request would have succeeded, but DryRun flag is set."
+        }
+    ]
+}
+```
+If you **don’t have permission**, you'll see this:  
+```json
+{
+    "Errors": [
+        {
+            "Code": "UnauthorizedOperation",
+            "Message": "You are not authorized to perform this operation."
+        }
+    ]
+}
+```
+
+2️⃣ **Starting an EC2 instance (Dry Run)**
+```bash
+aws ec2 start-instances --instance-ids i-0abcdef1234567890 --dry-run
+```
+- If the command **would work**, AWS will return a message confirming that the request **would have succeeded**.
+- If permissions are missing, AWS will return an **error message**.
+
+---
+
+### **📌 When to Use `--dry-run`?**
+✅ Before running a **destructive** command (e.g., terminating instances).  
+✅ To check if a **user has permissions** for an action.  
+✅ To **test** CLI commands before automation.
+
+💡 **Example - Checking If a User Can Delete an S3 Bucket (without actually deleting it):**
+```bash
+aws s3 rb s3://my-old-bucket --dry-run
+```
+
+---
+
+### **🔹 Summary**
+| Feature | Description |
+|---------|------------|
+| **CLI Format** | `aws <service> <command> [options]` |
+| **Common CLI Options** | `--region`, `--profile`, `--query`, `--output`, `--dry-run` |
+| **`--dry-run` Purpose** | Simulates a command **without executing it** |
+| **Use Cases** | Testing permissions, verifying commands before execution |
+
+---
+
+Would you like more **practical exercises** or **real-world scenarios** with AWS CLI? 🚀
