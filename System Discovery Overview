@@ -1,0 +1,99 @@
+Great! Here's a breakdown of **Module 3: System Discovery** based on the topics listed:  
+
+---
+
+### **🔷 Module Overview: System Discovery**
+Understanding how to discover, track, and manage AWS resources effectively is crucial for cloud operations. 
+This module covers the methods, tools, and best practices for automating resource discovery.
+
+---
+
+## **1️⃣ Course Scenario**
+📌 **Objective:**  
+- Imagine you're a CloudOps Engineer responsible for tracking AWS resources across multiple accounts and ensuring compliance.  
+- Your goal is to **identify, audit, and manage** AWS infrastructure using automated tools.  
+
+📌 **Why It Matters:**  
+- Keeping track of AWS resources helps with **security, compliance, and cost optimization**.  
+- Helps in **troubleshooting** when unexpected changes happen.  
+
+---
+
+## **2️⃣ Methods to Interact with AWS Services**
+AWS provides multiple ways to interact with its services for system discovery:
+
+✅ **AWS Management Console** – GUI-based access  
+✅ **AWS CLI (Command Line Interface)** – Scripting and automation  
+✅ **AWS SDKs (Python Boto3, Java, etc.)** – Programmatic access  
+✅ **AWS CloudFormation & CDK** – Infrastructure as Code (IaC)  
+✅ **AWS APIs** – Direct interaction for automation  
+
+📌 **Example:**  
+- Using AWS CLI to list all EC2 instances:  
+  ```bash
+  aws ec2 describe-instances
+  ```
+- Using Python (Boto3) to get S3 buckets:  
+  ```python
+  import boto3
+  s3 = boto3.client('s3')
+  response = s3.list_buckets()
+  print(response)
+  ```
+
+---
+
+## **3️⃣ Tools for Automating Resource Discovery**
+Several AWS services help with resource discovery:
+
+### **🔹 AWS Resource Groups**
+- Organizes AWS resources using **tags**.  
+- Helps filter and manage resources effectively.
+
+### **🔹 AWS Config**
+- Continuously monitors and records AWS resource configurations.  
+- Provides compliance checks against best practices.  
+- Example use case: **Checking if S3 buckets are public**.
+
+### **🔹 AWS Systems Manager Inventory**
+- Collects metadata about AWS resources, including installed software.  
+- Helps automate patch management and compliance reporting.
+
+### **🔹 AWS Trusted Advisor**
+- Provides real-time **best practice recommendations** on **security, cost, and performance**.
+
+---
+
+## **4️⃣ Inventory with AWS Systems Manager and AWS Config**
+These two tools are essential for system discovery.
+
+### **✅ AWS Systems Manager (SSM) Inventory**
+- Collects system details like OS, installed applications, and network configuration.
+- Used for **patch management, software inventory, and automation**.
+
+### **✅ AWS Config**
+- Tracks changes to AWS resources and **ensures compliance**.  
+- Example: Detecting if an EC2 instance is using an outdated security group.
+
+📌 **Use Case:**  
+- You can set up AWS Config rules to **detect unencrypted EBS volumes** and alert the security team.
+
+---
+
+## **5️⃣ Troubleshooting Scenario**
+**Example:**  
+- A security compliance team finds that **some S3 buckets are public**.  
+- **Solution:**
+  - Use **AWS Config** to detect public S3 buckets.  
+  - Use **AWS Systems Manager** to collect bucket details.  
+  - Use AWS CLI or API to update bucket policies.
+
+---
+
+## **🛠 LAB 1: Auditing AWS Resources with AWS Systems Manager & AWS Config**
+This hands-on lab will involve:
+✅ **Enabling AWS Config** to track changes.  
+✅ **Using AWS Systems Manager Inventory** to collect metadata.  
+✅ **Running queries to audit AWS resources**.  
+
+Would you like a step-by-step guide for the lab? 🚀
