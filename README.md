@@ -21,3 +21,18 @@
 10. AWS Organization
 11. Service Control Policy
 12. Access Management - QAs
+
+# Module - 3
+1. System Discovery Overview
+2. Interacting with AWS Resources
+3. AWS CLI
+4. Session Manager Overview
+5. Session Manager
+6. Cloud Shell
+7. Systems Manager
+8. AWS Config
+9. Inventory with AWS Systems Manager and AWS Config
+10. Sessions Manager - QAs
+11. System Discovery - Troubleshooting Scenario
+12. Lab - 1
+13. Lab - 1: Overview
