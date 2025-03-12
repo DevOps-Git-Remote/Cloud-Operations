@@ -1,0 +1,203 @@
+# **🔷 AWS Config – A Complete Guide**  
+
+## **📌 What is AWS Config?**  
+AWS **Config** is a **continuous monitoring and compliance service** that tracks **AWS resource configurations** and 
+evaluates them against **desired security and governance policies**.
+
+✅ **Tracks Configuration Changes** (EC2, S3, IAM, RDS, etc.)  
+✅ **Ensures Compliance with Security Policies**  
+✅ **Detects Unauthorized Changes**  
+✅ **Provides Historical Configuration Data**  
+✅ **Supports Multi-Account, Multi-Region Compliance**  
+
+---
+
+# **🔹 1️⃣ Key Features of AWS Config**
+| **Feature** | **Description** |
+|------------|---------------|
+| **Configuration Recorder** | Captures real-time changes in AWS resources. |
+| **Configuration Snapshot** | Stores historical configurations for auditing. |
+| **Rules & Compliance** | Defines policies to check compliance. |
+| **Change Management** | Tracks who changed what & when. |
+| **AWS Config Aggregator** | Combines data from multiple AWS accounts & regions. |
+
+---
+
+# **🔹 2️⃣ How AWS Config Works**
+1️⃣ **Configuration Recorder** – Captures AWS resource changes.  
+2️⃣ **AWS Config Rules** – Evaluates compliance (e.g., "S3 bucket must be encrypted").  
+3️⃣ **Configuration History** – Stores previous configurations for audit.  
+4️⃣ **Notifications** – Alerts via **Amazon SNS & AWS CloudTrail**.  
+5️⃣ **Multi-Account Compliance** – Uses **AWS Config Aggregator** for enterprise-wide monitoring.  
+
+---
+
+# **🔹 3️⃣ Enabling AWS Config**
+### **🔹 Steps to Set Up AWS Config**
+1️⃣ Go to **AWS Management Console** → **AWS Config**.  
+2️⃣ Click **"Get Started"**.  
+3️⃣ Select the **AWS resources** you want to track.  
+4️⃣ Enable **S3 bucket** to store AWS Config history.  
+5️⃣ Configure **IAM Role** for AWS Config.  
+6️⃣ Set up **AWS Config Rules** for compliance monitoring.  
+7️⃣ Click **"Confirm"** to start tracking resource configurations.  
+
+---
+
+# **🔹 4️⃣ AWS Config Components**
+## **📌 Configuration Recorder**
+The **Configuration Recorder** captures changes in AWS resources and records them in **AWS Config**.
+
+✔️ **Tracks real-time changes** (e.g., security group updates).  
+✔️ **Monitors specified AWS services**.  
+✔️ **Stores history in S3** for audits.  
+
+### **🔹 Enable Configuration Recorder via CLI**
+```bash
+aws configservice start-configuration-recorder --configuration-recorder-name default
+```
+
+---
+
+## **📌 Configuration History**
+AWS Config **stores historical records** of resource changes for **audit and compliance**.
+
+✔️ **Tracks changes to EC2 instances, S3 buckets, IAM roles, etc.**  
+✔️ **Logs who made the change & when it happened**.  
+✔️ **Stored in Amazon S3** for long-term storage.  
+
+### **🔹 Retrieve Configuration History via CLI**
+```bash
+aws configservice get-resource-config-history --resource-type AWS::EC2::Instance --resource-id i-0123456789abcdef
+```
+
+---
+
+## **📌 AWS Config Rules**
+AWS **Config Rules** define security & compliance policies for AWS resources.
+
+✔️ **Enforce Best Practices** (e.g., "S3 buckets must be private").  
+✔️ **Detect Misconfigurations** (e.g., "IAM Role must not have Admin Access").  
+✔️ **Automatic Remediation** (Optional).  
+
+### **🔹 Types of AWS Config Rules**
+| **Rule Type** | **Description** |
+|--------------|----------------|
+| **Managed Rules** | Predefined by AWS (e.g., `s3-bucket-public-read-prohibited`). |
+| **Custom Rules** | User-defined Lambda functions for compliance checks. |
+
+### **🔹 Example: Check If S3 Buckets Are Public**
+```json
+{
+  "ConfigRuleName": "s3-bucket-public-read-prohibited",
+  "Source": {
+    "Owner": "AWS",
+    "SourceIdentifier": "S3_BUCKET_PUBLIC_READ_PROHIBITED"
+  }
+}
+```
+
+### **🔹 Apply AWS Config Rule via CLI**
+```bash
+aws configservice put-config-rule --config-rule file://s3-rule.json
+```
+
+---
+
+# **🔹 5️⃣ AWS Config Aggregator – Multi-Account, Multi-Region Compliance**
+AWS **Config Aggregator** collects compliance data from **multiple AWS accounts & regions**.
+
+✔️ **Centralized compliance monitoring**.  
+✔️ **Detect non-compliant resources across accounts**.  
+✔️ **Used in AWS Organizations for enterprise-wide audits**.  
+
+### **🔹 Enable AWS Config Aggregator via CLI**
+```bash
+aws configservice put-configuration-aggregator --configuration-aggregator-name MyAggregator \
+    --account-aggregation-sources AccountIds=["123456789012","987654321098"]
+```
+
+---
+
+# **🔹 6️⃣ AWS Config Best Practices**
+✔️ **Enable AWS Config in All Regions** (for complete visibility).  
+✔️ **Use AWS Config Aggregator** (for multi-account compliance).  
+✔️ **Integrate with AWS Security Hub & GuardDuty** (for security insights).  
+✔️ **Use AWS Lambda for Automated Remediation**.  
+✔️ **Monitor Compliance Dashboards** in AWS Config Console.  
+
+---
+
+# **🔹 7️⃣ AWS Config Use Cases**
+## ✅ **1. Security & Compliance**
+✔️ Check if **S3 buckets are public**.  
+✔️ Detect **unrestricted security groups**.  
+✔️ Ensure **IAM roles follow least privilege principles**.  
+
+## ✅ **2. Change Management & Auditing**
+✔️ Track **who modified an EC2 instance**.  
+✔️ Detect **unauthorized IAM policy changes**.  
+✔️ Ensure **network ACLs & security groups are configured correctly**.  
+
+## ✅ **3. Multi-Account Governance**
+✔️ Aggregate **compliance reports across AWS Organizations**.  
+✔️ Detect **non-compliant resources across multiple AWS accounts**.  
+✔️ Integrate with **AWS Security Hub & AWS GuardDuty**.  
+
+---
+
+# **🔹 8️⃣ AWS Config vs. AWS CloudTrail**
+| **Feature** | **AWS Config** | **AWS CloudTrail** |
+|------------|---------------|-------------------|
+| **Purpose** | Tracks configuration changes | Logs API calls & user actions |
+| **Data Retention** | Stores full history | Retains logs for 90 days (default) |
+| **Focus** | Compliance & governance | Security monitoring & forensics |
+| **Example** | "Was this S3 bucket encrypted?" | "Who deleted the EC2 instance?" |
+
+---
+
+# **🔹 9️⃣ AWS Config Pricing**
+### **Pricing Based on:**
+✔️ **Number of Configuration Items** (Recorded resource changes).  
+✔️ **Number of AWS Config Rules Evaluations**.  
+✔️ **AWS Config Aggregator Usage**.  
+✔️ **S3 Storage Costs for Configuration History**.  
+
+✅ **First 100,000 Config Rules Evaluations are Free**.  
+✅ **Free Tier Includes 1,000 Configuration Items per Month**.  
+
+📌 **Estimate costs using the AWS Pricing Calculator**:  
+🔗 [AWS Config Pricing](https://aws.amazon.com/config/pricing/)  
+
+---
+
+# **🔟 Logging & Notifications in AWS Config**
+## ✅ **1. Enable AWS CloudTrail Logging**
+✔️ Logs AWS Config actions to **AWS CloudTrail**.  
+```bash
+aws cloudtrail create-trail --name ConfigTrail --s3-bucket-name my-config-logs
+```
+
+## ✅ **2. Enable SNS Notifications for Compliance Alerts**
+✔️ Notifies admins when resources are non-compliant.  
+```bash
+aws sns create-topic --name ConfigAlerts
+aws sns subscribe --topic-arn arn:aws:sns:us-east-1:123456789012:ConfigAlerts --protocol email --notification-endpoint admin@example.com
+```
+
+---
+
+# **📌 Summary – Why Use AWS Config?**
+| **Feature** | **AWS Config Benefit** |
+|------------|------------------------|
+| **Continuous Monitoring** | Tracks AWS resource changes in real time |
+| **Compliance Enforcement** | Ensures security & governance policies are met |
+| **Historical Configuration Data** | Stores past configurations for auditing |
+| **Multi-Account Visibility** | Aggregates compliance reports across AWS accounts |
+| **Security & Risk Management** | Detects misconfigurations and security risks |
+| **Automation & Alerts** | Automates compliance checks & sends alerts |
+
+---
+
+## **🚀 Next Steps**
+Would you like a **hands-on lab** to practice AWS Config setup & compliance checks? 😊
