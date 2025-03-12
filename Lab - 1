@@ -1,0 +1,268 @@
+Lab 1: Auditing Your AWS Resources with AWS Systems Manager and AWS Config
+© 2025 Amazon Web Services, Inc. or its affiliates. All rights reserved. This work may not be reproduced or redistributed, in whole or in part, without prior written permission from Amazon Web Services, Inc. Commercial copying, lending, or selling is prohibited. All trademarks are the property of their owners.
+
+Note: Do not include any personal, identifying, or confidential information into the lab environment. Information entered may be visible to others.
+
+Corrections, feedback, or other questions? Contact us at AWS Training and Certification.
+
+Lab overview
+You are a newly hired AWS Cloud Operations Administrator. You are assisting your company’s transition to the cloud. As part of the transition, the company wants you to employ AWS Systems Manager to aid in the management of AWS Cloud resources. You have been asked to verify that sessions from the AWS Systems Manager Fleet Manager can interact with managed Amazon EC2 instances. Next, you need use AWS Config to create an automated system to audit for any Amazon EC2 instances that are not managed by AWS Systems Manager. Finally, you need explore the use of AWS Systems Manager as a centralized way to view the inventory for any managed Amazon EC2 instance.
+
+In this lab, you perform initial setup processes for both AWS Config and AWS Systems Manager Inventory in an AWS environment with Amazon Elastic Compute Cloud (Amazon EC2) instances. AWS Config and Systems Manager are services that aid a CloudOps engineer in monitoring and remediating compliance tasks.
+
+AWS Systems Manager is a collection of capabilities for configuring and managing your Amazon EC2 instances, on-premises servers, virtual machines, and other Amazon Web Services (AWS) resources at scale. AWS Systems Manager Inventory is a component service of Systems Manager that provides visibility into your AWS computing environment. You can use Inventory to collect metadata from all of your managed nodes.
+
+With AWS Config, you can streamline compliance auditing, security analysis, change management, and operational troubleshooting of your AWS resources. AWS Config continuously monitors and records your AWS resource configurations and automatically evaluates the recorded configurations against your desired configuration. With AWS Config you can: review changes in configurations, dive into detailed resource configuration histories, review relationships between AWS resources, and determine your overall compliance with your defined configurations and internal guidelines.
+
+Objectives
+By the end of this lab, you should be able to do the following:
+
+Setup AWS Systems Manager Inventory for an AWS infrastructure.
+Use AWS Systems Manager to securely log into Amazon EC2 instances.
+Setup AWS Config for an AWS infrastructure.
+Use AWS Config to audit AWS resources for organizational level compliance.
+Use AWS Systems Manager Inventory to view the metadata on your managed instances.
+Technical knowledge prerequisites
+This lab requires the following prerequisites:
+
+Access to a computer with internet and Microsoft Windows, macOS X, or Linux.
+An internet browser, such as Google Chrome, Mozilla Firefox, or Microsoft Internet Explorer 11 (previous versions of Internet Explorer are not supported).
+Basic knowledge of Amazon EC2 and Amazon CloudWatch services.
+Icon key
+Various icons are used throughout this lab to call attention to different types of instructions and notes. The following list explains the purpose for each icon:
+
+ Command: A command that you must run.
+ Expected output: A sample output that you can use to verify the output of a command or edited file.
+ Note: A hint, tip, or important guidance.
+ Learn more: Where to find more information.
+ Task complete: A conclusion or summary point in the lab.
+Start lab
+To launch the lab, at the top of the page, choose Start Lab.
+
+ Caution: You must wait for the provisioned AWS services to be ready before you can continue.
+
+To open the lab, choose Open Console .
+
+You are automatically signed in to the AWS Management Console in a new web browser tab.
+
+ Warning: Do not change the Region unless instructed.
+
+Common sign-in errors
+Error: You must first sign out
+Log out error
+
+If you see the message, You must first log out before logging into a different AWS account:
+
+Choose the click here link.
+Close your Amazon Web Services Sign In web browser tab and return to your initial lab page.
+Choose Open Console again.
+Error: Choosing Start Lab has no effect
+In some cases, certain pop-up or script blocker web browser extensions might prevent the Start Lab button from working as intended. If you experience an issue starting the lab:
+
+Add the lab domain name to your pop-up or script blocker’s allow list or turn it off.
+Refresh the page and try again.
+Lab environment
+When you start the lab, the environment contains the resources shown in the following diagram:
+
+ Note: The numbers represent the logical workflow of the architecture in this lab.
+
+The architecture diagram of the lab 1 environment.
+
+
+Image description: The preceding diagram depicts the architecture diagram for the lab where you setup both AWS Systems Manager components and AWS Config services for the lab AWS environment.
+
+The AWS Systems Manager service is used to:
+
+manage a fleet of Amazon EC2 instances
+securely connect to any Amazon EC2 instance
+to collect inventory of instance metadata, and installed apps
+The AWS Config service is used to create compliance rules at an organizational level. A common use case is to combine both AWS Config and AWS Systems Manager to automate remediation actions against those rules. However, in this lab it will be used to perform only an audit of specific resources in the lab environment.
+
+AWS services not used in this lab
+AWS service capabilities used in this lab are limited to what the lab requires. Expect errors when accessing other services or performing actions beyond those provided in this lab guide.
+
+Task 1: Setup Systems Manager Inventory
+In this task, you set up the Inventory function within Systems Manager to later review its results in Task 5. Setting up AWS Systems Manager Inventory allows performing an audit of the metadata associated with Amazon EC2 instances within your account. You can configure Inventory on all of your managed nodes, including those in different regions. Note that Systems Manager Inventory collects only metadata from your managed nodes. Inventory does not access proprietary information or data stored on your compute resources.
+
+AWS Systems Manager gives you visibility and control of your infrastructure on AWS. It provides a unified user interface so you can view operational data from multiple AWS services. Systems Manager un-complicates resource and application management, shortens the time to detect and resolve operational problems, and lets you manage your infrastructure securely at scale.
+
+To setup AWS Systems Manager for use with your Amazon EC2 instances the following prerequisites must be met:
+
+The AWS Systems Manager Agent (SSM Agent) must be installed on any instance needing to communicate to AWS Systems Manager.
+The user performing the first-time setup of the Systems Manager service needs the necessary IAM write permissions for the Systems Manager Service. By default, an IAM user does not have the necessary IAM permissions for setting up the Systems Manager service.
+Both Amazon EC2 resources and the AWS Systems Manager service require IAM permissions to perform actions on your behalf. You must grant the appropriate IAM permissions to both the Systems Manager service and the Amazon EC2 instances that will be managed.
+ Learn more: You can learn in greater detail about the Systems Management requirements from the Systems Manager documentation in the appendix.
+
+ Note: In this lab, the necessary prerequisites to setup AWS Systems Manager have been provided to you.
+
+The lab provided Amazon EC2 instances are all using the Amazon Linux 2 operating system. The Amazon Machine Image (AMI) for Amazon Linux 2 always has the SSM agent installed by default.
+The IAM entity that you use for accessing this lab environment has the permissions needed to access AWS Systems Manager already associated with it.
+The prerequisite IAM permissions needed for AWS Systems Manager and Amazon EC2 services to work together are provided for you.
+Search for Systems Manager using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+
+Select Inventory from the  Node Management sub-menu in the Systems Manager navigation menu.
+
+Select the Setup Inventory button at the top of the page.
+
+On the Targets card select the button next to Manually selecting instances. This will give you the opportunity to choose a selection of nodes within your account.
+
+Select the checkbox  next to the nodes named Web Server and App Server in the expanded menu.
+
+Leave the default values for the remainder of the options.
+
+Select Setup Inventory button.
+
+ Expected output: At the top of the page you should see a green banner noting that you Inventory of these compute nodes has been successully added as a function to Systems Manager. No further input from you is required to complete the Inventory process.
+
+ Task complete: You have completed setting up the AWS Systems Manager Inventory.
+
+Task 2: Log into an Amazon EC2 instance with the AWS Systems Manager Session Manager tool
+In this task, you review the Amazon EC2 instances in your account that you can manage through Systems Manager Fleet Manager, and start a terminal session using the Session Manager functionality within Systems Manager. You then perform a high-level inventory of the EC2 entities in your account through the AWS CLI.
+
+ Note: Other ways to start a session with managed Amazon EC2 instances include using the AWS Command Line Interface (AWS CLI) or the Amazon EC2 console.
+
+For correctly configured Amazon EC2 instances, you can use the Session Manager tool to connect to a terminal on individual Amazon EC2 instances without having to configure Secure Shell (SSH). The Session Manager tool is more secure because the SSH port (22) does not need to be opened in Security Groups. There are additional beneficial features of connecting to instances with Systems Manager Session Manager are: key pairs no longer need to be managed, cross-platform access is streamlined for users, and an audit trail for instance access can be created with AWS CloudTrail.
+
+Select Fleet Manager from the  Node Management sub-menu in the Systems Manager navigation menu.
+Fleet Manager helps you remotely manage your nodes running on AWS or on premises. It allows you to perform common troubleshooting and management tasks from the console. This includes connecting to Windows instances using the Remote Desktop Protocol (RDP), and connecting to Linux instances through Session Manager
+
+Select the link to node ID listed next to node named “Web Server”.
+
+In the Node actions pull-down menu in the top right hand corner of resulting page, select Connect > Start terminal session link.
+
+ Note: A terminal for the Amazon EC2 instance is displayed in a new browser tab. The instance ID of the Amazon EC2 instance you are connected to is displayed on the top banner.
+
+ Command: Enter the following command at the command prompt of the terminal. netstat -a | grep http
+ Expected output:
+
+A list of connections is displayed.
+
+ Command: Run this command in the session window:
+
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+# Get region
+AZ=`curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/placement/availability-zone`
+export AWS_DEFAULT_REGION=${AZ::-1}
+
+# List information about EC2 instances
+aws ec2 describe-instances
+ Note: This command uses the AWS CLI to provide information about Amazon EC2 instances in the region and provides you another method you can use to quickly review the information about the entities in your AWS account.
+
+Once you have reviewed the returned information you can safely end the session to the Amazon EC2 instance.
+
+Choose the Terminate button.
+
+From the pop-up window titled Terminate session, choose the Terminate button.
+
+Close the browser window that hosted the session.
+
+ Task complete: You have used the Fleet Manager and Session Manager tools to connect to an Amazon EC2 instance that is managed by the AWS Systems Manager service and run commands local to a single instance from the terminal interface to provide information about the entities in your AWS account.
+
+Task 3: Enable AWS Config and create a rule to check Amazon EC2 instance compliance
+In this task, you set up AWS Config along with one Config rule.
+
+Search for Config using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+
+Choose the Get started button.
+
+The Settings page of the AWS Config setup is displayed.
+
+In the Settings section select the following options:
+
+Recording strategy: All resource types with customizable overrides
+Recording frequency: Continuous recording
+In the Override settings section, choose the Remove button to remove the overide.
+
+In the Data governance section, for IAM role for AWS Config, choose Create AWS Config service-linked role. If this option is not available select Use an existing AWS Config service-linked role instead.
+
+Choose the Next button.
+
+The Rules page of the AWS Config setup is displayed.
+
+In the filter search field enter ec2-instance-managed-by-systems-manager.
+Fill the checkbox  next to the AWS Config rule titled ec2-instance-managed-by-systems-manager. The rule will highlight when selected.
+Choose the Next button.
+The Review page of the AWS Config setup is displayed.
+
+Choose the Confirm button.
+AWS Config finishes the setup process and the AWS Config Dashboard page is displayed.
+
+Select Rules from the main AWS Config navigation bar on the left (note: there is also a Rules entry under the Aggregators listing in the navigation bar. You do NOT want the Rules listing underneath the Aggregators. You want the one above it.) You may need to expand the navigation bar by selecting the menu icon  in the left corner.
+ Note: The initial setup process for AWS Config is now complete. Additionally, you added one compliance rule, ec2-instance-managed-by-systems-manager, to AWS Config during the setup process. This AWS Config rule scans for any Amazon EC2 instances in the infrastructure and the Compliance column displays Evaluating… while the scan is in progress. When the scan has finished, AWS Config returns a compliance report which lists the compute resources that are and are not currently managed by AWS Systems Manager.
+
+Select ec2-instance-managed-by-systems-manager from the Rules section.
+ Note: In time, your compliance status will show your (2) Amazon EC2 instances as Compliant as the AWS Config and AWS Systems Manager services sync. However, the compliance status of any one Config rule in this lab is not critically important and does not block you from completing all other tasks in the lab. You may proceed to the next task and return later to check your Config rule compliance status. If your AWS Config rule returns a result of No resources in scope you need to wait up to 5 minutes for the Amazon EC2 to synchronize with Config and re-evaluate the ec2-instance-managed-by-systems-manager AWS Config rule.
+
+It takes several minutes for AWS Config to synchronize with AWS Systems Manager about the compliance status of managed Amazon EC2 instances. It is okay to periodically select the refresh button  from the console until there is a change in the Compliance column. The compliance status for the rule ec2-instance-managed-by-systems-manager changes from Noncompliant resource(s) to Compliant once the status is synchronized between the services.
+
+ Task complete: You setup AWS Config along with one Config rule.
+
+Task 4: Create an AWS Config rule to audit user IAM permissions
+In this task, you add an additional AWS Config rule to the lab environment. Config scans for compliance of resources within your infrastructure to the rule. Then, you examine the results of the Config Rule scan.
+
+Choose Rules from the AWS Config navigation bar on the left.
+Choose the Add Rule button.
+The Specify rule type page is displayed.
+
+Ensure  Add AWS managed rule is selected.
+
+Enter iam-user-no-policies-check into the rule search bar.
+
+Select the radio switch  next to the iam-user-no-policies-check item returned in the search results.
+
+Choose the Next button.
+
+The Configure rule page is displayed.
+
+All default settings on this page work for this lab.
+
+Choose the Next button.
+The Review and create page is displayed.
+
+Choose the Save button.
+You have added a new AWS Config rule to your infrastructure that scans for IAM users with attached inline policies. The newly added Config rule immediately begins a scan to evaluate the compliance of IAM resources.
+
+ Note: In this case you should not expect these resources to become compliant. If you click on the resources in the scope of this rule, and view their Configuration Item, you will see they have policies attached. You do not need to remediate any non-compliant resource in this lab. In this lab scenario the task was to use AWS Config rules to verify if any company user has inline IAM policies attached.
+
+You have now setup more than one rule for AWS Config using the web console. In your personal AWS Environment, the creation of Config rules can be automated using either CloudFormation or one of the AWS SDK’s.
+
+ Task complete: AWS Config now has an automated scan for IAM users having attached inline policies.
+
+Task 5: Explore inventory collected by Systems Manager
+In this task, you explore the inventory of installed application on the Amazon EC2 instances. This inventory was created by the Systems Manager command documents that ran during the task named Setup Systems Manager.
+
+Search for Systems Manager using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+Select Inventory from the  Node Management section of the AWS Systems Manager navigation bar, found on the left.
+The Inventory dashboard is displayed.
+
+Locate the Top 5 Applications section on the dashboard. What are the top 5 applications installed on the managed Amazon EC2 instances and what versions are they?
+Locate the Corresponding managed instances section on the dashboard.
+Select the link to the instance ID for one of the managed Amazon EC2 instances.
+An AWS Systems Manager details page for the Amazon EC2 instance is displayed.
+
+Locate the General section. What is the IP address for this Amazon EC2 instance? What SSH key is associated with this Amazon EC2 instance? What type of Amazon EC2 instance is this node?
+Select the Tags link in the Details pane. Which tags are associated with this Amazon EC2 instance?
+Select the Inventory link in the Details pane.
+Enter bind-utils into the filter search box. Then choose the bind-utils result that appears. Which version of the package is installed on this Amazon EC2 instance? What architecture is it for?
+Select the Associations link in the Details pane. When was the last SSM document run on this Amazon EC2 instance? What was the name of that SSM document?
+Select the Patches link in the Details pane. If there are no patches found, why might this be? Hint You will learn about Systems Manager Command Documents in later labs to address these actions such as patching and configuration changes for a entire fleet of Managed instances. If you did find patches applied to an instance the information listed in this section includes answers to the questions: How many patches have been applied to this Amazon EC2 instance since it was launched? Did any of the patches encounter an error while updating? Is any further patching currently needed?
+Select the Configuration compliance link in the Details pane. Is this Amazon EC2 instance out of compliance with any of the patches?
+ Task complete: You have examined the inventory collected by AWS Systems Manager for a single Amazon EC2 instance and gained understanding of the type of information that is available.
+
+Conclusion
+You have successfully done the following:
+
+Completed the initial quick setup process of AWS Systems Manager and took inventory of an environment’s compute resources.
+Completed the initial setup process and enabled AWS Config for an environment.
+Added more compliance rules to be monitored by AWS Config in your infrastructure.
+Reviewed inventory collected by AWS Systems Manager for a single Amazon EC2 instance.
+End lab
+Follow these steps to close the console and end your lab.
+
+Return to the AWS Management Console.
+
+At the upper-right corner of the page, choose AWSLabsUser, and then choose Sign out.
+
+Choose End Lab and then confirm that you want to end your lab.
+
+For more information about AWS Training and Certification, see https://aws.amazon.com/training/.
