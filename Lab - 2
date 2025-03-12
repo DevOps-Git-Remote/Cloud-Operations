@@ -1,0 +1,442 @@
+Lab 2: Infrastructure as Code
+© 2025 Amazon Web Services, Inc. or its affiliates. All rights reserved. This work may not be reproduced or redistributed, in whole or in part, without prior written permission from Amazon Web Services, Inc. Commercial copying, lending, or selling is prohibited. All trademarks are the property of their owners.
+
+Note: Do not include any personal, identifying, or confidential information into the lab environment. Information entered may be visible to others.
+
+Corrections, feedback, or other questions? Contact us at AWS Training and Certification.
+
+Lab overview
+Your manager asked you to add a new application server to support one of the company’s web applications. To accomplish this, you need to update the CloudFormation template that was used in the initial deployment of the application servers. After completing this update, you need to create a new Resource Group for the application servers to ensure that they are appropriately tagged for future tracking and management.
+
+You update an AWS CloudFormation template, create and add tags to a Resource Group, and track changes to resources deployed by a CloudFormation template. CloudFormation templates can automate day-to-day management and give greater control over automation and oversight of the cloud computing infrastructure.
+
+Objectives
+By the end of this lab, you should be able to do the following:
+
+Use Infrastructure Composer to update a deployed CloudFormation template.
+Create a Resource Group and add tags to track infrastructure assets.
+Use the AWS CloudFormation drift detection feature to locate differences between current configurations and those in a defined template.
+Technical knowledge prerequisites
+This lab requires the following prerequisites:
+
+Access to a computer with internet and Microsoft Windows, macOS X, or Linux.
+An internet browser, such as Google Chrome, Mozilla Firefox, or Microsoft Internet Explorer 11 (previous versions of Internet Explorer are not supported).
+Basic knowledge of AWS CloudFormation.
+Icon key
+Various icons are used throughout this lab to call attention to different types of instructions and notes. The following list explains the purpose for each icon:
+
+ Note: A hint, tip, or important guidance.
+ WARNING: An action that is irreversible and could potentially impact the failure of a command or process (including warnings about configurations that cannot be changed after they are made).
+ File contents: A code block that displays the contents of a script or file that you need to run, which has been pre-created for you.
+ Knowledge check: An opportunity to check your knowledge and test what you have learned.
+ Task complete: A conclusion or summary point in the lab.
+Start lab
+To launch the lab, at the top of the page, choose Start Lab.
+
+ Caution: You must wait for the provisioned AWS services to be ready before you can continue.
+
+To open the lab, choose Open Console .
+
+You are automatically signed in to the AWS Management Console in a new web browser tab.
+
+ Warning: Do not change the Region unless instructed.
+
+Common sign-in errors
+Error: You must first sign out
+Log out error
+
+If you see the message, You must first log out before logging into a different AWS account:
+
+Choose the click here link.
+Close your Amazon Web Services Sign In web browser tab and return to your initial lab page.
+Choose Open Console again.
+Error: Choosing Start Lab has no effect
+In some cases, certain pop-up or script blocker web browser extensions might prevent the Start Lab button from working as intended. If you experience an issue starting the lab:
+
+Add the lab domain name to your pop-up or script blocker’s allow list or turn it off.
+Refresh the page and try again.
+Lab environment
+The following diagram represents the major components used in this lab. The numbers represent the logical workflow of the architecture in this lab.
+
+The architecture diagram of the lab 2 environment.
+
+Image description: The preceding diagram depicts the use CloudFormation templates to deploy a stack and make changes within the lab environment. Changes are made to the environment outside of CloudFormation. The changed environment is compared against the CloudFormation template using the drift detection feature of CloudFormation. Changes are made to the original CloudFormation template and the stack is updated using the new version of the template. Then, you verify the stack that is deployed matches the CloudFormation template.
+
+AWS services not used in this lab
+AWS service capabilities used in this lab are limited to what the lab requires. Expect errors when accessing other services or performing actions beyond those provided in this lab guide.
+
+Task 1: Update CloudFormation stack with Infrastructure Composer
+AWS CloudFormation gives you a straightforward way to model a collection of Amazon Web Services (AWS) and third-party resources, provision them quickly and consistently, and manage the resources by treating infrastructure as code. A CloudFormation template describes resources and their dependencies so you can launch and configure them together as a CloudFormation stack.
+
+In this task, you launch a CloudFormation stack from a provided template. The template defines both the application server and web server instances for one of your company’s products. After the stack is successfully deployed, edit the template using Infrastructure Composer to add a new resource. Next, after making edits to the CloudFormation template, update the existing stack. Finally, verify that the stack updated with the new resources you defined in the new version of the CloudFormation template.
+
+Task 1.1: Launch a CloudFormation stack from an existing template
+ Note: A basic CloudFormation template defining several Amazon EC2 resources has been provided to you for this lab. You use the provided CloudFormation template to launch a CloudFormation stack.
+
+Search for CloudFormation using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+Choose the Create Stack  button.
+Select the With new resources (standard) option from the drop-down menu.
+The Create Stack page is displayed.
+
+Select  Choose an existing template.
+
+For the Specify template section ensure the  Amazon S3 URL option is selected.
+
+Copy and paste the entire following value into Amazon S3 URL field https://us-west-2-tcprod.s3.amazonaws.com/courses/ILT-TF-200-SYSOPS/v5.5.5.prod-0aa01b9d/lab-2-infrastructure_as_code/scripts/workingstack.yml.
+
+Choose the Next button.
+
+The Specify stack details page is displayed.
+
+ WARNING: The stack name is case sensitive in this lab. It is important you enter the stack name exactly as it is in the instructions.
+
+For Stack name copy and paste the value Working.
+Choose the Next button.
+The Configure stack options page is displayed.
+
+ Note: All the default values on this page are valid for this lab.
+
+Choose the Next button.
+The Review Working page is displayed.
+
+ Note: Review the details and go back to the Previous pages if you need to make a correction.
+
+Choose the Submit button.
+CloudFormation begins creating the stack of cloud resources as defined in the template. The status displays as CREATE_IN_PROGRESS.
+
+ Note: The stack status is located on the left under the stack name Working. The status in the Events section refers to an individual resource’s status and not the stack status as a whole.
+
+It takes a few minutes to provision the entire CloudFormation stack.
+
+Refresh  the Events section with the console button, until the whole stack status is  CREATE_COMPLETE.
+ WARNING: If during the stack creation, you receive the error in the CloudFormation status column that reads as,  CREATE_FAILED for the reason, "Your requested instance type (t3.micro) is not supported in your requested Availability Zone[…] ", then please Delete the Working stack and re-create it by repeating Task 1.1. This error is caused by a low number of on-demand Amazon EC2 inventory, of that particular instance size, in that specific AWS Availability Zone, at the time of stack creation. Ask the trainer for help if you need assistance deleting and re-creating the CloudFormation stack.
+
+Search for EC2 using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+Choose Instances from the Instances sub-menu in the Amazon EC2 navigation bar.
+Verify that all four Amazon EC2 instances defined in the CloudFormation template appear on the Amazon EC2 console.
+ Task complete: You launched a CloudFormation stack of compute resources from a CloudFormation template.
+
+Task 1.2: Edit and update the existing CloudFormation stack named Working
+Search for CloudFormation using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+Select the link for the Working stack from the Stack name column, located in the Stacks section of the CloudFormation console.
+Choose the Update button.
+The Update stack page is displayed.
+
+Choose the  Edit in Infrastructure Composer option from the Prerequisite - Prepare Template section.
+The Edit template in Infrastructure Composer page is now displayed.
+
+Choose the Edit in Infrastructure Composer button.
+The Infrastructure Composer is displayed.
+
+In the search box, below Resources, type AWS::EC2::Instance.
+
+Select and drag AWS::EC2::Instance into the diagram area to the right.
+
+A new Amazon EC2 instance resource is added to the CloudFormation template.
+
+On the new instance that you added, choose Details.
+
+Set the Logical ID to AppServer3.
+
+Choose Save.
+
+In the right pane, choose Template.
+
+In the YAML code of the CloudFormation template, locate the resource with the Logical ID AppServer1.
+
+Copy all of the Properties text of the AppServer1 resource. The Metadata section of the resource is not needed.
+
+The code you copy should be similar to the following:
+
+
+    # AppServer1 code
+    Properties:
+      AvailabilityZone: !Join
+        - ''
+        - - !Ref AWS::Region
+          - a
+      ImageId: !Ref AmazonLinuxAMIID
+      InstanceType: t3.micro
+      SecurityGroupIds:
+        - !ImportValue AppSGOutput
+      SubnetId: !ImportValue LabSubnetOutput
+      Tags:
+        - Key: Project
+          Value: Working
+        - Key: Name
+          Value: AppServer1
+ WARNING: YAML is syntax sensitive to spacing and new line entries. Indents are two spaces in YAML. If the syntax is wrong, then the CloudFormation template will not be valid.
+
+In the YAML code of the CloudFormation template, locate the new Amazon EC2 instance that was added.
+
+Paste and overwrite the Properties: {} section of AppServer3 resource with the Properties text that was copied from the AppServer1 resource.
+
+In recently pasted AppServer3 properties section of the template, locate the tag with the key Name and change the value from AppServer1 to AppServer3.
+
+For the new Amazon EC2 resource added to the template, the value for the tag Name and the Logical ID should now both be AppServer3.
+
+ File contents: For your reference, the AppServer3 resource in the CloudFormation template, minus the unnecessary Metadata section, should be as follows:
+
+
+  # AppServer3 Code
+  AppServer3:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Join
+        - ''
+        - - !Ref AWS::Region
+          - a
+      ImageId: !Ref AmazonLinuxAMIID
+      InstanceType: t3.micro
+      SecurityGroupIds:
+        - !ImportValue AppSGOutput
+      SubnetId: !ImportValue LabSubnetOutput
+      Tags:
+        - Key: Project
+          Value: Working
+        - Key: Name
+          Value: AppServer3
+ Note: Using the menu in the top right of the composer you can save the updated CloudFormation template to local storage or to an Amazon Simple Storage Service (Amazon S3) bucket. It is not necessary to save a copy of the template locally in order to complete stack update actions. However, it is a good practice to save a copy of your CloudFormation templates while you work on them.
+
+Choose the Canvas tab.
+
+Choose Update template.
+
+Choose Confirm and continue to CloudFormation.
+
+The Update stack page is displayed.
+
+Choose the Next button.
+The Specify stack details page is displayed.
+
+ Note: All the default values on this page are valid for this lab.
+
+Choose the Next button.
+The Configure stack options page is displayed.
+
+ Note: All the default values on this page are valid for this lab.
+
+Choose the Next button.
+The Review Working page is displayed.
+
+Review the Changes section after it loads and notice that a new Amazon EC2 resource is being Added to the existing CloudFormation stack.
+Choose the Submit button.
+The Working stack page is displayed.
+
+ Note: The status for the Working CloudFormation stack displays as UPDATE_IN_PROGRESS and changes to UPDATE_COMPLETE when the new resource has finished deployment to the CloudFormation stack.
+
+Periodically refresh the page or the console and monitor the Events tab of the CloudFormation stack until the stack update completes.
+Search for EC2 using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+Choose Instances from the Instances sub-menu in the Amazon EC2 navigation bar.
+Observe that a new Amazon EC2 instance named AppServer3 has been launched.
+Select the AppServer3 EC2 instance and review the instance Details tab.
+ Knowledge check: Although the CloudFormation earlier reported that the stack update is complete, has the EC2 instance completed both status checks? If not, what change would you make to the CloudFormation template that will cause CloudFormation service to wait for a signal that the instance status checks have passed before reporting the stack status as complete?
+
+ Task complete: You launched a new compute resource in an existing stack by updating the YAML code in a CloudFormation template.
+
+Task 2: Creating tags and groups with Resource Groups
+In this task, you use AWS Resource Groups to manage tagging on your AWS resources.
+
+Search for Resource Groups & Tag Editor using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+Select Tag Editor from the navigation menu on the left.
+In the Find resources to tag section, configure the following resources:
+Resource types drop-down menu: Search for and select AWS::EC2::Instance. You can type in this search box.
+Select the Search resources button.
+In the Resource search results section select the checkbox  next to all three of the AppServer Amazon EC2 instances.
+
+Select the Manage tags of selected resources button.
+
+The Manage tags page is displayed.
+
+Three Amazon EC2 instances should be returned in the results.
+
+Select the Add tag button from the Edit tags of all selected resources section.
+A new data entry line is displayed in the Edit tags of all selected resources section.
+
+In the blank Enter tag key section enter cost-center.
+In the blank Enter tag value enter production.
+Choose the Review and apply tag changes button.
+A pop-up window titled Apply tag changes to the selected resource is displayed to give you a chance to review the changes.
+
+Choose the Apply changes to all selected button.
+A banner is displayed at the top of the page with the text, “Successfully applied tag changes to all 3 selected resources” when the change has been completed.
+
+Choose Create Resource Group from the Resources sub-menu in the AWS Resource Groups navigation bar. You may need to expand the service navigation menu by choosing the menu button .
+
+Ensure the  Tag based option is selected in the Group type section.
+
+ Note: You want to search for specific production environment resources, not all resources that might be in your environment.
+
+For Grouping criteria configure the following criteria:
+Tag key enter cost-center
+Optional tag value enter production
+Select the Preview group resources button.
+ Note: The three Amazon EC2 instances named AppServer should be returned as results in the Group resources section.
+
+In the Group details section, enter ProductionApplicationServers for Group name.
+Select the Create group button.
+ Expected output: A banner is displayed at the top of the page with text similar to, ‘The resource group “ProductionApplicationServers” has been successfully created in the current region.’ when the resource group has been successfully created. You can view any of your previously created resource groups by choosing Saved Resource Groups in the navigation menu and then selecting the individual resource group.
+
+ Note: In your personal AWS environment you may have several identical copies of a cloud resource that belong to different logical groupings. For example, you may have more than one Amazon EC2 instance with the same AMI deployed as a web server belonging to different environments such as Dev, Test, and Prod. To keep things straightforward in this lab, there is a single purposed logical cost-center which has a value of production. Strategies to simplify managing resources in your cloud infrastructure include accurately tagging resources and creating resource groups based on those tags. Most AWS resources and on-premise resources managed by AWS Systems Manager support tagging and resource groups.
+
+ Task complete: You created a new resource group named ProductionApplicationServers. This resource group is comprised only of resources that have a cost-center tag of production.
+
+Task 3: Use CloudFormation to detect stack drift
+In this task, you use the CloudFormation detect drift feature. Drift detection finds how AWS resources currently deployed in a CloudFormation stack have drifted from the CloudFormation template.
+
+Search for CloudFormation using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+Select the link for the Working stack, from the Stack name column, in the list that is displayed in Stacks section.
+Select the Stack actions  button.
+Choose Detect drift from the drop-down menu.
+Select the Stack actions  button.
+Choose View drift results from the drop-down menu.
+The Drift status displays as  DRIFTED.
+
+Select the radio switch next to one of the Amazon EC2 instances in the Resource drift status section that has a Drift Status of MODIFIED.
+Select the View drift details button.
+The Drift details page for the resource is displayed. The Differences section shows an itemized listed of changes. In the Property column, the Tags item has a value of ADD in the Change column.
+
+Select the radio button  next to the item that has the value Tags in the Property column.
+The drift for this resource is highlighted in the Actual column.
+
+Examine the Details section of the CloudFormation drift page.
+The Details section of the Drift details page has two sections. One section is labelled Expected. The Expected section displays the original configuration for a resource as defined by the JSON in the CloudFormation template. The other section is labelled Actual. The Actual section displays the configuration of a resource as it currently is.
+
+Examine the JSON code highlighted in the Actual section. This is new tag you added to the resource with the Tag Editor in a previous task.
+Example of the added code:
+
+
+    {
+      "Key": "cost-center",
+      "Value": "production"
+    }
+ Note: In the drift details page, CloudFormation displays the template code in JSON. In earlier tasks you were editing a CloudFormation template in YAML. You can create and edit CloudFormation templates in either YAML or JSON. Infrastructure Composer allows you to toggle between these two languages.
+
+ Task complete: You have used the CloudFormation Detect drift feature to find the exact difference between a resource’s actual configuration and its expected configuration as defined in a CloudFormation template.
+
+Task 4: Update stack to add tags
+In this task, you update the CloudFormation template for the Working stack to include the cost center tags for the Amazon EC2 instances. By updating the CloudFormation template the tags are applied to the resources by CloudFormation every time the template is used to create or update a stack. Updating the resource in the CloudFormation template means that whenever the stack is created or updated from this template, the tags no longer have to be added manually through separate actions.
+
+Recall in the task Creating tags and groups with Resource Groups you created a Resource Group named ProductionApplicationServers for resources with cost-center: production tags. Tagged resources are automatically added to appropriate pre-existing AWS Resource Groups. That means any resources in the environment with the cost-center:production tags are included in the Resource Group. This includes resources created by CloudFormation.
+
+Task 4.1: Adding new tag values to the template
+Choose Stacks from the CloudFormation navigation menu on the left.
+Select the link for the Working stack, from the Stack name column, located in the list displayed in the Stacks section.
+Choose the Update button.
+The Update stack page is displayed.
+
+Choose the  Edit in Infrastructure Composer button from the Prerequisite - Prepare Template section.
+The Edit template in Infrastructure Composer section is displayed on the page.
+
+Select the Edit in Infrastructure Composer button.
+The Composer page is displayed.
+
+Choose the Template tab.
+
+Locate the AppServer3 resource in the CloudFormation template.
+
+The AppServer resources currently has two tags. You now add a third tag to the Amazon EC2 instance resources by inserting new lines of YAML in the CloudFormation template. Remember to keep the appropriate spacing and indention when writing in YAML.
+
+Add another tag to the properties with the key cost-center and value production like this:
+
+        # Tag to add
+        - Key: cost-center
+          Value: production
+The resource AppServer3 should now have 3 tags defined.
+
+ File contents: The complete definition for AppServer3 in the template should now be as follows:
+
+
+  # Complete definition of AppServer3
+  AppServer3:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      AvailabilityZone: !Join
+        - ''
+        - - !Ref 'AWS::Region'
+          - a
+      ImageId: !Ref AmazonLinuxAMIID
+      InstanceType: t3.micro
+      SecurityGroupIds:
+        - 'Fn::ImportValue': AppSGOutput
+      SubnetId:
+        'Fn::ImportValue': LabSubnetOutput
+      Tags:
+        - Key: Project
+          Value: Working
+        - Key: Name
+          Value: AppServer3
+        - Key: cost-center
+          Value: production
+Add the same tag to AppServer1 and AppServer2.
+
+        # Tag to add
+        - Key: cost-center
+          Value: production
+Choose the Canvas tab.
+ WARNING: If the template is not valid, an error will appear and you will need to correct the error within Infrastructure Composer.
+
+Choose Update template.
+
+Choose Confirm and continue to CloudFormation.
+
+The Update stack page is displayed.
+
+Select  Replace existing template
+
+Choose the Next button.
+
+The Specify stack details page is displayed.
+
+ Note: All the default values on this page are valid for this lab.
+
+Choose the Next button.
+The Configure stack options page is displayed.
+
+ Note: All the default values on this page are valid for this lab.
+
+Choose the Next button.
+The Review Working page is displayed.
+
+Review the Change set preview section once it loads and notice that the Amazon EC2 resources in the stack are in the Modified state.
+Choose the Submit button.
+The Working stack page is displayed.
+
+Periodically refresh the page or the console and monitor the Events tab of the CloudFormation stack.
+The status for the Working CloudFormation stack displays as UPDATE_IN_PROGRESS, and changes to UPDATE_COMPLETE when the resources in the CloudFormation stack finish modifying.
+
+ Task complete: You have changed an existing CloudFormation template to include changes from a detected drift and you also updated a CloudFormation stack using a new version of the template.
+
+Task 4.2: Verify the change to CloudFormation stack
+Search for EC2 using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+Choose Instances from the Instances sub-menu in the EC2 navigation bar.
+Select one of the AppServer instances.
+Select the Tags tab from instance Details section.
+Verify the tag named cost-center with a value production is currently attributed to the instance.
+Repeat the verification for the remaining 2 AppServers.
+Search for CloudFormation using the Unified Search Bar at the top of the AWS Console, and choose the service from the listed results.
+Select the link for the Working stack from the Stack name column, located in the list displayed in Stacks section.
+Choose the Stack actions  button.
+Select the Detect drift option from the drop-down menu.
+Choose the Stack actions  button.
+Select the View drift results option from the drop-down menu.
+The Drift status now displays  IN_SYNC.
+
+ Note: You are now familiar with concept of drift for CloudFormation stacks and the process of how to manually identify what is currently drifted in your CloudFormation stacks from the original template. Your personal AWS environment may have multiple CloudFormation stacks. Manually checking each stack for drift is not an efficient use of time. The following AWS blog article should give you an example of how to leverage multiple AWS services together in order to architect a more automated solution to this and other common CloudOps engineering tasks. https://aws.amazon.com/blogs/mt/implement-automatic-drift-remediation-for-aws-cloudformation-using-amazon-cloudwatch-and-aws-lambda/
+
+ Task complete: You updated the CloudFormation Working stack with the template code change, verified the change took effect in Amazon EC2, and you remediated the CloudFormation stack’s drift status.
+
+Conclusion
+You have successfully done the following:
+
+Used Infrastructure Composer to update a deployed CloudFormation template.
+Created a Resource Group and added tags to track infrastructure assets.
+Used the AWS CloudFormation drift detection feature to locate differences between current configurations and those in a defined template.
+End lab
+Follow these steps to close the console and end your lab.
+
+Return to the AWS Management Console.
+
+At the upper-right corner of the page, choose AWSLabsUser, and then choose Sign out.
+
+Choose End Lab and then confirm that you want to end your lab.
