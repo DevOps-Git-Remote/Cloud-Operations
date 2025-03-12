@@ -1,0 +1,152 @@
+# **📌 System Discovery: Troubleshooting Scenarios, SSM Managed Instance Role & iam:PassRole**  
+
+AWS **System Discovery** helps identify, troubleshoot, and manage resources across AWS accounts. Below, we will cover **troubleshooting scenarios**, 
+the **SSMManagedInstanceRole**, and the **iam:PassRole permission** in AWS.  
+
+---
+
+# **🔹 1️⃣ System Discovery Troubleshooting Scenarios**  
+System Discovery in AWS involves using tools like **AWS Systems Manager (SSM), AWS Config, AWS CloudTrail, and IAM roles** to detect and resolve issues.  
+
+### **🔹 Common Troubleshooting Scenarios & Solutions**
+| **Issue** | **Possible Cause** | **Solution** |
+|------------|------------------|-------------|
+| **EC2 instance not showing in Systems Manager Inventory** | - SSM Agent not installed/enabled<br>- IAM Role missing permissions | - Install & start SSM Agent<br>- Attach `AmazonSSMManagedInstanceCore` policy |
+| **AWS Config does not track resource changes** | - AWS Config not enabled<br>- Resource type not included | - Enable AWS Config<br>- Ensure correct resource types are tracked |
+| **AWS Config Aggregator missing data from linked accounts** | - Linked accounts not configured properly<br>- IAM permissions missing | - Check AWS Config Aggregator settings<br>- Ensure IAM roles allow cross-account access |
+| **SSM Session Manager unable to connect to EC2 instance** | - SSM Agent not running<br>- VPC endpoint for SSM not configured | - Restart SSM Agent<br>- Configure VPC endpoints for SSM |
+| **EC2 instance cannot access S3 via SSM** | - IAM Role missing `s3:GetObject` permission | - Attach `AmazonS3ReadOnlyAccess` policy |
+
+### **🔹 Example: Checking SSM Agent Status on EC2 Instance**  
+To check if SSM Agent is running on an EC2 instance:  
+```bash
+sudo systemctl status amazon-ssm-agent
+```
+If not running, start the agent:  
+```bash
+sudo systemctl start amazon-ssm-agent
+```
+
+---
+
+# **🔹 2️⃣ SSMManagedInstanceRole (IAM Role for Systems Manager)**
+The **SSMManagedInstanceRole** is an IAM role that **grants EC2 instances permissions to communicate with AWS Systems Manager**.  
+
+### **✅ Why is SSMManagedInstanceRole Important?**  
+✔️ Allows **AWS Systems Manager** to manage EC2 instances.  
+✔️ Enables **SSM Session Manager, Patch Manager, and Inventory collection**.  
+✔️ **Grants access to S3** for storing logs and downloading updates.  
+
+### **✅ Required IAM Policy: `AmazonSSMManagedInstanceCore`**  
+To enable AWS Systems Manager on EC2, attach the **AmazonSSMManagedInstanceCore** policy to the instance’s IAM role.  
+
+#### **🔹 Policy: AmazonSSMManagedInstanceCore**  
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:DescribeAssociation",
+                "ssm:GetDeployablePatchSnapshotForInstance",
+                "ssm:GetDocument",
+                "ssm:DescribeDocument",
+                "ssm:GetManifest",
+                "ssm:ListAssociations",
+                "ssm:ListInstanceAssociations",
+                "ssm:PutInventory",
+                "ssm:PutComplianceItems",
+                "ssm:PutConfigurePackageResult",
+                "ssm:UpdateAssociationStatus",
+                "ssm:UpdateInstanceAssociationStatus",
+                "ssm:UpdateInstanceInformation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+### **✅ Attaching the Role to an EC2 Instance (AWS CLI)**  
+```bash
+aws iam create-instance-profile --instance-profile-name SSMInstanceProfile
+aws iam add-role-to-instance-profile --instance-profile-name SSMInstanceProfile --role-name SSMManagedInstanceRole
+aws ec2 associate-iam-instance-profile --instance-id i-1234567890abcdef --iam-instance-profile Name=SSMInstanceProfile
+```
+
+### **✅ Verifying if EC2 Has the Correct Role**  
+To check if an EC2 instance has the correct IAM role attached:  
+```bash
+aws ec2 describe-instances --instance-id i-1234567890abcdef --query "Reservations[*].Instances[*].IamInstanceProfile.Arn"
+```
+
+---
+
+# **🔹 3️⃣ iam:PassRole – Passing IAM Roles to AWS Services**  
+The `iam:PassRole` permission **allows users and services to assign IAM roles to AWS resources**.  
+
+### **✅ Why is iam:PassRole Important?**  
+✔️ Required when **assigning IAM roles to EC2 instances, Lambda functions, ECS tasks, or other AWS services**.  
+✔️ Without `iam:PassRole`, users **cannot associate an IAM role** with an AWS resource.  
+✔️ Helps **control which roles can be passed** to different AWS services.  
+
+### **🔹 Example Scenario: SSM Session Manager Fails Due to Missing iam:PassRole Permission**  
+🔴 **Issue:**  
+When launching an EC2 instance with **Systems Manager enabled**, it **fails to connect** due to a missing IAM role.  
+
+🔹 **Cause:**  
+The user lacks `iam:PassRole` permission to assign the **SSMManagedInstanceRole** to the instance.  
+
+✅ **Solution:**  
+Grant the user **iam:PassRole permission** for the required IAM role.  
+
+#### **🔹 IAM Policy for PassRole**  
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::123456789012:role/SSMManagedInstanceRole",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": "ec2.amazonaws.com"
+                }
+            }
+        }
+    ]
+}
+```
+### **✅ Granting iam:PassRole via AWS CLI**  
+```bash
+aws iam attach-user-policy --user-name AdminUser --policy-arn arn:aws:iam::aws:policy/service-role/AmazonSSMManagedInstanceCore
+```
+
+### **🔹 How to Check if You Have iam:PassRole Permission**  
+Run the following AWS CLI command:  
+```bash
+aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::123456789012:user/AdminUser --action-names iam:PassRole
+```
+If denied, update the policy to **allow `iam:PassRole`**.  
+
+---
+
+# **📌 Summary & Next Steps**
+### **✅ Troubleshooting System Discovery Issues**
+✔️ Ensure **SSM Agent is running** on EC2 instances.  
+✔️ Verify **IAM role permissions** for AWS Config & Systems Manager.  
+✔️ Check **VPC Endpoints for private connectivity** to AWS Systems Manager.  
+
+### **✅ SSMManagedInstanceRole**
+✔️ Attach **AmazonSSMManagedInstanceCore** policy to EC2 instances.  
+✔️ Allows **SSM Session Manager, Patch Manager, and Inventory collection**.  
+✔️ Verify role attachment using AWS CLI.  
+
+### **✅ iam:PassRole Permission**
+✔️ Needed for **assigning IAM roles** to AWS resources.  
+✔️ Grant users **iam:PassRole** for `SSMManagedInstanceRole`.  
+✔️ Use IAM conditions (`iam:PassedToService`) to limit role usage.  
+
+Would you like a **step-by-step hands-on lab** for configuring System Discovery in AWS? 😊
