@@ -1,0 +1,166 @@
+### **📌 AWS Cloud Operations – Module 5: Automate Resource Deployment**  
+
+### **🎯 Objective**  
+This module covers how to **automate resource deployment** in AWS using various automation tools and best practices. You'll learn:  
+✅ **Infrastructure as Code (IaC) with AWS CloudFormation**  
+✅ **Automation with AWS Systems Manager**  
+✅ **AWS Service Catalog for pre-approved deployments**  
+✅ **Using CI/CD pipelines for automated deployments**  
+✅ **AWS Config for continuous compliance**  
+
+---
+
+## **🛠 Topics Covered in Module 5**
+1️⃣ **Introduction to Infrastructure Automation**  
+2️⃣ **Automating Deployments with AWS CloudFormation**  
+3️⃣ **Using AWS Systems Manager for Automation**  
+4️⃣ **AWS Service Catalog for Pre-Approved Resources**  
+5️⃣ **CI/CD Pipelines for Automated Deployments**  
+6️⃣ **AWS Config for Compliance Automation**  
+7️⃣ **Troubleshooting Automated Deployments**  
+
+---
+
+## **🔹 1. Introduction to Infrastructure Automation**
+**Why Automate AWS Resource Deployment?**  
+- **Consistency**: Eliminates manual errors.  
+- **Speed**: Reduces deployment time from hours to minutes.  
+- **Scalability**: Deploys multiple resources efficiently.  
+- **Cost Efficiency**: Ensures optimized resource allocation.  
+- **Security & Compliance**: Standardizes resource configuration.  
+
+---
+
+## **🔹 2. Automating Deployments with AWS CloudFormation**  
+### **🛑 What is AWS CloudFormation?**  
+AWS CloudFormation allows you to define **infrastructure as code (IaC)** using YAML or JSON templates.  
+
+### **✅ Key Features:**  
+- **Declarative Configuration:** Define AWS resources in a template.  
+- **Stack Management:** Create, update, and delete AWS infrastructure as a **single unit (stack)**.  
+- **Drift Detection:** Detects unauthorized changes in infrastructure.  
+- **Rollback on Failure:** Ensures safe deployments.  
+
+### **🛠 Hands-on: Deploy an EC2 Instance Using CloudFormation**  
+#### **Step 1: Create a CloudFormation Template**  
+Save the following YAML template as `ec2-instance.yaml`:  
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  MyEC2Instance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: "ami-12345678"  # Replace with a valid AMI ID
+      InstanceType: "t2.micro"
+      KeyName: "MyKeyPair"
+      Tags:
+        - Key: "Environment"
+          Value: "Production"
+```
+#### **Step 2: Deploy Using AWS Console**  
+1. Open **AWS CloudFormation → Create Stack**.  
+2. Upload `ec2-instance.yaml` and click **Next**.  
+3. Configure stack name (e.g., `MyEC2Stack`) → Click **Create Stack**.  
+4. Once deployment completes, verify the EC2 instance in **AWS EC2 Dashboard**.  
+
+---
+
+## **🔹 3. Using AWS Systems Manager for Automation**  
+AWS Systems Manager allows you to **automate operational tasks** like patching, configurations, and script execution.  
+
+### **✅ Key Features:**  
+- **SSM Documents (Run Command, State Manager, Patch Manager).**  
+- **Secure Remote Administration** without opening SSH/RDP.  
+- **Automated Patch Management** for EC2 instances.  
+
+### **🛠 Hands-on: Run a Script on Multiple EC2 Instances**  
+#### **Step 1: Enable SSM Agent on EC2**  
+- Attach `AmazonSSMManagedInstanceCore` IAM role to EC2 instances.  
+- Ensure SSM Agent is installed and running.  
+
+#### **Step 2: Execute Remote Commands**  
+1. Open **AWS Systems Manager → Run Command**.  
+2. Click **Run a command** → Choose **AWS-RunShellScript**.  
+3. Enter command:  
+   ```sh
+   sudo yum update -y
+   ```
+4. Select **EC2 instances** and click **Run Command**.  
+5. View execution logs in **Command history**.  
+
+---
+
+## **🔹 4. AWS Service Catalog for Pre-Approved Resources**  
+AWS Service Catalog allows organizations to **predefine and control the deployment of AWS services** for users.  
+
+### **✅ Key Features:**  
+- **Pre-approved CloudFormation templates**.  
+- **Restrict resource configurations** to meet compliance.  
+- **Self-service provisioning** for users.  
+
+### **🛠 Hands-on: Create a Service Catalog Product**  
+1. Open **AWS Service Catalog → Create Product**.  
+2. Upload a CloudFormation template for EC2 deployment.  
+3. Assign **permissions** to specific users/groups.  
+4. Publish the product, allowing users to **deploy infrastructure** in a controlled manner.  
+
+---
+
+## **🔹 5. CI/CD Pipelines for Automated Deployments**  
+AWS CodePipeline automates application deployment using:  
+✅ **AWS CodeCommit (Git Repo)**  
+✅ **AWS CodeBuild (Build Service)**  
+✅ **AWS CodeDeploy (Deployment Service)**  
+
+### **🛠 Hands-on: Deploy a Web App Using CodePipeline**  
+#### **Step 1: Create a CodeCommit Repository**  
+1. Open **AWS CodeCommit → Create Repository**.  
+2. Clone repo and push sample app code.  
+
+#### **Step 2: Set Up CodePipeline**  
+1. Open **AWS CodePipeline → Create Pipeline**.  
+2. Select **Source: CodeCommit**, **Build: CodeBuild**, **Deploy: CodeDeploy**.  
+3. Click **Create Pipeline** and trigger deployment.  
+
+---
+
+## **🔹 6. AWS Config for Compliance Automation**  
+AWS Config continuously **monitors resource configurations** and ensures compliance.  
+
+### **✅ Key Features:**  
+- **Detects non-compliant resources**.  
+- **Generates compliance reports**.  
+- **Automates remediation actions**.  
+
+### **🛠 Hands-on: Enforce S3 Bucket Encryption**  
+1. Open **AWS Config → Add Rule**.  
+2. Select **S3 Bucket Encryption**.  
+3. Enable automatic remediation with AWS Lambda.  
+
+---
+
+## **🔹 7. Troubleshooting Automated Deployments**  
+
+| **Issue** | **Troubleshooting Steps** |  
+|------------|----------------------|  
+| **CloudFormation Stack Fails** | Check CloudFormation events & validate template. |  
+| **SSM Commands Not Executing** | Verify IAM role and SSM Agent installation. |  
+| **CodePipeline Fails** | Check logs in CodePipeline, CodeBuild, and CodeDeploy. |  
+| **Service Catalog Product Not Deploying** | Ensure IAM permissions are correctly assigned. |  
+| **AWS Config Non-Compliant Resources** | Review AWS Config compliance reports and take action. |  
+
+---
+
+# **✅ Summary: Automate AWS Resource Deployment (Module 5)**  
+
+| **Topic** | **Key Takeaways** |  
+|------------|----------------------|  
+| **CloudFormation** | Infrastructure as Code (IaC) for automated resource deployment. |  
+| **AWS Systems Manager** | Automates patching, configuration, and script execution on EC2. |  
+| **AWS Service Catalog** | Controls and manages pre-approved resource provisioning. |  
+| **CI/CD with CodePipeline** | Automates application deployment from Git to AWS. |  
+| **AWS Config** | Ensures compliance with automated rules and remediation. |  
+
+🎯 **Mastering these AWS automation tools will help you deploy infrastructure faster, reduce manual effort, and enforce compliance!** 🚀  
+
+💡 **Do you want to practice hands-on with CloudFormation, AWS Config, or CI/CD?** Let me know, and I'll guide you step-by-step! 😊
