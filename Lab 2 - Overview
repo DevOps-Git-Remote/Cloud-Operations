@@ -1,0 +1,54 @@
+### **Lab 2: Infrastructure as Code – Overview**
+
+This lab focuses on using **AWS CloudFormation** to manage infrastructure as code (IaC). You will update a CloudFormation template to provision new resources, apply tags using **AWS Resource Groups & Tag Editor**, and use **CloudFormation Drift Detection** to track changes. This is crucial for **automating deployments, maintaining consistency, and managing cloud resources efficiently**.
+
+---
+
+## **Key Tasks in the Lab**
+
+### **Task 1: Updating CloudFormation Stack with Infrastructure Composer**
+1. **Launch a CloudFormation Stack**  
+   - Use a pre-provided **CloudFormation template** stored in an **Amazon S3 URL**.  
+   - This deploys **application and web server instances**.  
+   - Verify that **four EC2 instances** are created.
+
+2. **Edit and Update the CloudFormation Stack**  
+   - Modify the stack using **Infrastructure Composer** to add an **AppServer3 EC2 instance**.  
+   - Copy properties from an existing AppServer1 instance.  
+   - Update the stack and verify that **AppServer3 is launched successfully**.  
+   - Ensure the new instance passes health checks.
+
+---
+
+### **Task 2: Creating Tags & Resource Groups**
+1. **Use AWS Resource Groups & Tag Editor** to apply tags to EC2 instances.
+2. **Create a new Resource Group (`ProductionApplicationServers`)**  
+   - Based on the tag `cost-center: production`.  
+   - Helps manage and track application servers.
+
+---
+
+### **Task 3: Detecting Stack Drift**
+1. **Use CloudFormation Drift Detection** to check if any resource has been modified outside of CloudFormation.
+2. **Review Drift Results**  
+   - Differences between **expected vs. actual configurations** are highlighted.  
+   - Detects manual modifications like new **tags added via AWS Tag Editor**.
+
+---
+
+### **Task 4: Updating Stack to Include Tags**
+1. **Modify CloudFormation Template to add cost-center tags.**  
+   - Instead of manual tagging, update the stack to automatically tag new EC2 instances.
+2. **Apply the same tags to AppServer1, AppServer2, and AppServer3.**  
+3. **Update the CloudFormation stack** to ensure future deployments include these tags automatically.
+
+---
+
+## **Key Takeaways**
+✅ **Infrastructure as Code (IaC)**: Automates provisioning and management of AWS resources.  
+✅ **CloudFormation Templates**: Manage resources declaratively and track changes.  
+✅ **Resource Tagging & Grouping**: Simplifies resource management and tracking.  
+✅ **Drift Detection**: Helps monitor unintended changes outside of CloudFormation.  
+✅ **Best Practices**: Always tag resources and version-control templates for consistency.
+
+Would you like an in-depth breakdown of any specific part? 🚀
