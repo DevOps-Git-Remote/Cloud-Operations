@@ -1,0 +1,103 @@
+# Access Management:
+Access Management in AWS ensures that the right people and systems have the appropriate level of access to AWS Resources. It helps Secure Workloads enforce Least Privilege Access and Manage User Identities effectively.
+
+AWS IAM: -> Global Service
+  User authentication -> Secure access control for AWS Resources
+  Authorization -> Permissions for Users, Groups, and Roles
+  Fine Grained policies -> Control Access to specific AWS services and actions.
+  MFA -> Adds an extra security layer
+
+IAM Users, Groups, Roles, & Policies
+  Users -> Individual AWS Accounts -> Login to AWS and perform actions based on permissions.
+  Groups -> Collection of users with shared policies 
+  Roles -> Temporary Permissions for AWS Services/users -> Assumed by AWS Services or users temporarily (No Password or Long-Term Permissions)
+  Policies -> JSON-based permissions for users. groups or roles -> Define what actions are allowed or denied (Attached to User, Groups, and Roles)
+
+IAM:
+  Authentication -> Who are you?
+  Authorization -> What permissions do you have?
+  AWS Organizations -> Allows Centralized management of multiple AWS accounts.
+  Service Control Policies -> Restrict permissions at the Account Level across AWS Organizations. -> Ensure compliance by blocking unwanted actions.
+  AWS IAM Identity Center -> Enables Centralized authentication and authorization across multiple AwS accounts. -> Integreates with AD, OKTA, Google Workspace.
+  AWS Resource Access Manager -> Allows Resource sharing across AWS accounts without duplication IAM roles. -> Supports VPC Subnets, Transit Gateways, License Manager Config. -> Reduce Costs
+
+Credentials Management in AWS
+  IAM Password
+  Access Keys
+  Session Tokens
+  X.509 Certificates
+  MFA -> extra layer of Security
+  Federated Authentication -> authenticate using "External Identity Providers" Like Identity Center. -> IDPs provides a SAML or OIDC token. -> Benefit: No Need to Manager IAM Users.
+  Temporary Credentials with AWS Security Token Service -> Provides temporary credentials instead of long-term access keys. -> Benefit: Reduces security as credentials expire automatically.
+
+
+IAM Users:
+  An Identity and Access Management User is an "ENTITY" that represents an individual person or application that interacts with AWS. 
+  Used for:
+    secure access to AWS
+    Applying fine-grained permissions using IAM Policies
+    Assigning MFA
+    Managing programmatic access via access keys
+  Can Authenticate using:
+    Password
+    Access Keys -> Allows IAM Users to interact with AWS programatically via CLI, SDK, API Calls
+    MFA
+    STS
+  By default IAM User do not have any permissions.
+
+IAM Roles:
+  An IAM Role is an "AWS Identity" with specific permissions that allow AWS Services, applications, or users to access resources without needing Long-term credentials like passwords or access keys
+  Used for:
+    Avoiding Long-term Credentials
+    Secure Access across AWS Services -> Services can assume Roles
+    Federated Access -> Idnetity Providers 
+    Cross-Account Access -> grant access to another AWS account
+  Types:
+    Application Role
+    Service Role
+    Federated Role 
+    Cross-Account Role
+
+IAM Policies:
+  An IAM Policy is a JSON document that defines Permissions for users, groups amd roles in AWS. It determines "Who Can do What"
+  Types:
+    Managed Policies -> Pre-defined Policies by AWS & Custom Policies by Users
+    Inline Policies -> Policies embedded within an IAM User, Group, Role
+    Service Control Policies -> Apply permissions to AWS Organizations accounts
+    Permissions Boundaries -> Set Maximum permissions for IAM entity
+    Session Policies -> Temporary permissions attached when assuming a role
+  Examples:
+    AdministratorAccess
+    PowerUserAccess
+    ReadOnlyAccess
+    AmazonS3FullAccess
+    AmazonEC2ReadOnlyAccess
+  Identity-Based VS Resource-based Policies
+    Identity-Based -> Attached to IAM Users, groups or roles. -> What actions are allowed or denied. -> Apply across multiple resources. -> Policies: AWS Managed, Custom Managed, Inline
+    Resource-Based -> Attached directly to AWS Resources. -> Allows cross-account access. -> Supports Allow or Deny. -> Control Access to specific Resource
+
+IAM Groups:
+  An IAM Group is a collection of IAM Users that share same permissions. Helps to reduce assigning permissions individually and improves scalability.
+  Used for:
+    Granting same level of permissions to 10 users.
+    manage Admin access and Developer Access separately
+    Revoke Access when employee leaves.
+  Examples:
+    AdminGroup
+    Developergroup
+    SupportGroup
+    BillingGroup
+
+AWS Well Architected Tool:
+  AWS WA Tool is a "Free Cloud-based service" that helps organizations "Assess, improve, and optimize" their AWS workloads based on AWS Best Practices. Build around AWS WA Framework.
+  Helps teams "Evaluate Workloads" Against AWS best Practices
+  Provides Improvement Recommendations to optimize security, cost, performance and resilience
+  Key Features:
+    Workload Assessment & Review
+    Best Practice Recommendations
+    AWS WA Lenses -> MachineLearning SAAS, Data Analytics, IOT
+    Integration with AWS Organization
+    Custom Lenses
+      
+    
+
